@@ -57,16 +57,21 @@ export function UnitCard({ unit, progress }: UnitCardProps) {
           <p className="text-sm text-muted-foreground">Last accuracy: {progress.accuracy}%</p>
         )}
       </CardContent>
-      <CardFooter className="flex gap-2">
+      <CardFooter className="flex flex-wrap gap-2">
         <Button
           variant="outline"
           size="sm"
+          className="min-w-[7.5rem] flex-1"
           onClick={() => updateProgress(unit.id, { status: "IN_PROGRESS" })}
         >
           <Circle className="h-4 w-4" />
           Practice
         </Button>
-        <Button size="sm" onClick={() => updateProgress(unit.id, { status: "COMPLETED" })}>
+        <Button
+          size="sm"
+          className="min-w-[9.25rem] flex-1"
+          onClick={() => updateProgress(unit.id, { status: "COMPLETED" })}
+        >
           <CheckCircle2 className="h-4 w-4" />
           Mark complete
         </Button>
