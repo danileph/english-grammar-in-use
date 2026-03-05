@@ -62,9 +62,13 @@ export default async function UnitsLayout({
   return (
     <main className="mx-auto w-full max-w-[1400px] px-4 pb-8 pt-5">
       <div className="overflow-hidden rounded-[28px] border bg-white/70 shadow-sm">
-        <div className="grid min-h-[calc(100vh-8.5rem)] grid-cols-1 lg:grid-cols-[330px,1fr]">
-          <UnitsSidebar groups={groups} />
-          <section className="min-h-[calc(100vh-8.5rem)] border-l bg-white/55 p-4 sm:p-6">{children}</section>
+        <div className="min-h-[calc(100vh-8.5rem)] flex flex-col lg:flex-row">
+          <div className="lg:w-[330px] lg:shrink-0 lg:border-r">
+            <UnitsSidebar groups={groups} />
+          </div>
+          <section className="min-h-[calc(100vh-8.5rem)] flex-1 border-t bg-white/55 p-4 sm:p-6 lg:border-t-0">
+            {children}
+          </section>
         </div>
       </div>
     </main>
