@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, CircleArrowDown, Search } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { SidebarMenuLinkItem } from "@/components/sidebar-menu";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 
 type SidebarUnit = {
   id: string;
@@ -61,7 +60,7 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
         {filteredGroups.map((group) => (
           <section key={group.topic} className="border-b py-3 last:border-b-0">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">{group.topic}</h3>
+              <h3 className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">{group.topic}</h3>
               <ChevronDown className="h-5 w-5 text-muted-foreground" />
             </div>
             <div className="space-y-1">
@@ -69,24 +68,17 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
                 const href = `/units/${unit.id}`;
                 const isActive = pathname === href;
                 return (
-                  <Link
+                  <SidebarMenuLinkItem
                     key={unit.id}
                     href={href}
-                    className={cn(
-                      "flex items-center gap-2 rounded-2xl px-3 py-2 transition-colors",
-                      isActive ? "bg-secondary/70" : "hover:bg-muted/70",
-                    )}
-                  >
-                    <span
-                        className={cn(
-                            "inline-flex h-7 min-w-7 items-center justify-center rounded-md border bg-background px-1 text-sm font-semibold text-muted-foreground",
-                            isActive && "border-primary/30 bg-primary/15 text-primary",
-                        )}
-                    >
-                        {unit.order}
-                    </span>
-                    <span className="line-clamp-2 flex-1 text-md leading-tight">{unit.title}</span>
-                  </Link>
+                    isActive={isActive}
+                    badge={unit.order}
+                    title={unit.title}
+                    className="px-3"
+                    activeClassName=""
+                    badgeClassName=""
+                    activeBadgeClassName=""
+                  />
                 );
               })}
             </div>

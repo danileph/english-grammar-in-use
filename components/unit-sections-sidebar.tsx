@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { cn } from "@/lib/utils";
+import { SidebarMenu, SidebarMenuLinkItem } from "@/components/sidebar-menu";
 
 type UnitSectionItem = {
   id: string;
@@ -53,39 +52,22 @@ export function UnitSectionsSidebar({ sections }: UnitSectionsSidebarProps) {
   return (
     <aside className="hidden xl:block">
       <div className="sticky top-24 rounded-2xl p-3 w-[240px]">
-        <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-          Unit sections
-        </p>
-        <nav className="space-y-1">
+        <SidebarMenu title="Unit sections">
           {sections.map((section) => {
             const isActive = section.id === activeId;
 
             return (
-              <Link
+              <SidebarMenuLinkItem
                 key={section.id}
                 href={`#${section.id}`}
-                className={cn(
-                  "flex items-center gap-2 rounded-xl px-2 py-2 text-sm transition-colors",
-                  "hover:bg-muted/70",
-                  isActive ? "bg-muted text-foreground" : "text-muted-foreground",
-                )}
+                isActive={isActive}
+                badge={section.label}
+                title={section.title}
                 onClick={() => setActiveId(section.id)}
-              >
-                <span
-                  className={cn(
-                    "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-xs font-semibold",
-                    isActive
-                      ? "border-primary/35 bg-primary/10 text-primary"
-                      : "border-border bg-background text-muted-foreground",
-                  )}
-                >
-                  {section.label}
-                </span>
-                <span className="line-clamp-2 leading-tight">{section.title}</span>
-              </Link>
+              />
             );
           })}
-        </nav>
+        </SidebarMenu>
       </div>
     </aside>
   );
