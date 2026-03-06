@@ -56,7 +56,7 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
         </div>
       </div>
 
-      <div className="max-h-[calc(100vh-13rem)] overflow-y-auto px-3 py-2">
+      <div className="h-[calc(100vh-260px)] overflow-y-auto px-3 py-2">
         {filteredGroups.map((group) => (
           <section key={group.topic} className="border-b py-3 last:border-b-0">
             <div className="mb-2 flex items-center justify-between">

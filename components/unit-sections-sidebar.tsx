@@ -88,22 +88,24 @@ export function UnitSectionsSidebar({
           </div>
         </div>
 
-        <SidebarMenu title="Unit sections">
-          {sections.map((section) => {
-            const isActive = section.id === activeId;
+        {sections.length > 0 ? (
+          <SidebarMenu title="Unit sections">
+            {sections.map((section) => {
+              const isActive = section.id === activeId;
 
-            return (
-              <SidebarMenuLinkItem
-                key={section.id}
-                href={`#${section.id}`}
-                isActive={isActive}
-                badge={section.label}
-                title={section.title}
-                onClick={() => setActiveId(section.id)}
-              />
-            );
-          })}
-        </SidebarMenu>
+              return (
+                <SidebarMenuLinkItem
+                  key={section.id}
+                  href={`#${section.id}`}
+                  isActive={isActive}
+                  badge={section.label}
+                  title={section.title}
+                  onClick={() => setActiveId(section.id)}
+                />
+              );
+            })}
+          </SidebarMenu>
+        ) : null}
       </div>
     </aside>
   );
