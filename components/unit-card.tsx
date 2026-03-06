@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, Timer } from "lucide-react";
+import { BookOpen, Pencil, Timer } from "lucide-react";
 import type { ProgressStatus, UnitItem } from "@/types";
 
 import { Badge } from "@/components/ui/badge";
@@ -44,31 +44,37 @@ export function UnitCard({ unit, progress }: UnitCardProps) {
           <CardTitle className="text-base">
             {unit.order}. {unit.title}
           </CardTitle>
-          <Badge variant={status.badgeVariant}>{status.label}</Badge>
         </div>
-        <CardDescription className="flex items-center gap-1">
-          <Timer className="h-4 w-4" />
-          {unit.estimatedMinutes} min
+        <CardDescription className="flex items-center gap-1 justify-between">
+          <div className="flex items-center gap-1">
+            <Timer className="h-4 w-4" />
+            {unit.estimatedMinutes} min
+          </div>
+          <Badge variant={status.badgeVariant}>{status.label}</Badge>
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <Progress value={status.progressValue} />
-        {progress.accuracy !== null && (
-          <p className="text-sm text-muted-foreground">Last accuracy: {progress.accuracy}%</p>
-        )}
+      <CardContent className="flex items-center gap-2">
+        <p className="text-sm text-muted-foreground">Accuracy</p>
+        <Progress value={progress.accuracy ?? 0} />
+        <p className="text-sm text-muted-foreground">%</p>
       </CardContent>
-      <CardFooter className="flex gap-2">
+      <CardFooter className="flex flex-col gap-2">
         <Button
-          variant="outline"
-          size="sm"
-          onClick={() => updateProgress(unit.id, { status: "IN_PROGRESS" })}
+            size="sm"
+            className="w-full"
+            onClick={() => updateProgress(unit.id, { status: "IN_PROGRESS" })}
         >
-          <Circle className="h-4 w-4" />
-          Practice
+          <BookOpen className="h-4 w-4" />
+          Learn
         </Button>
-        <Button size="sm" onClick={() => updateProgress(unit.id, { status: "COMPLETED" })}>
-          <CheckCircle2 className="h-4 w-4" />
-          Mark complete
+        <Button
+            variant="secondary"
+            size="sm"
+            className="w-full"
+            onClick={() => updateProgress(unit.id, { status: "COMPLETED" })}
+        >
+          <Pencil className="h-4 w-4" />
+          Practice
         </Button>
       </CardFooter>
     </Card>
