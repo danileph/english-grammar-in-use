@@ -59,7 +59,7 @@ export default async function UnitsLayout({
   }));
 
   return (
-    <main className="mx-auto w-full max-w-[1400px] px-4 pb-8 pt-5">
+    <main className="mx-auto w-full max-w-[1400px] px-4 pb-8 pt-8">
       <div className="rounded-2xl border bg-white/70 shadow-sm">
         <div className="flex flex-col lg:flex-row relative">
           <div className="lg:w-[260px] lg:shrink-0 lg:border-r bg-white/85 rounded-l-2xl">
