@@ -7,7 +7,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-[1400px] px-4 pb-8 pt-5">
-      <div className="rounded-[28px] border bg-white/70 p-5 shadow-sm sm:p-8">
+      <div className="rounded-2xl border bg-white/70 p-5 shadow-sm sm:p-8">
         <section className="grid items-center gap-8 rounded-3xl border bg-muted/30 p-6 lg:grid-cols-2 lg:p-10">
           <div className="space-y-6">
             <h1 className="max-w-xl text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-6xl">

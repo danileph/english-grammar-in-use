@@ -37,8 +37,8 @@ export function SiteHeader() {
   }, [session, setUser]);
 
   return (
-    <header className="sticky top-0 z-30 w-full px-4 pt-4">
-      <div className="mx-auto flex h-16 w-full max-w-[1400px] items-center justify-between rounded-2xl border bg-white/80 px-5 shadow-sm backdrop-blur">
+    <header className="sticky top-0 z-30 w-full px-4 pt-4 border-box">
+      <div className="mx-auto flex h-16 w-full max-w-[calc(1400px-32px)] items-center justify-between rounded-2xl border bg-white/80 px-5 shadow-sm backdrop-blur">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
