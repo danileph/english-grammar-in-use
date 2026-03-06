@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
 import { UnitSectionsSidebar } from "@/components/unit-sections-sidebar";
-import { UnitProgressPanel } from "@/components/unit-progress-panel";
+import { UnitMetaBar } from "@/components/unit-meta-bar";
 import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -69,8 +69,8 @@ export default async function UnitDetailPage({
       <div className="space-y-5">
         <header className="border-b pb-4">
           <p className="text-sm font-medium text-muted-foreground">{unit.topic}</p>
-          <h1 className="text-3xl font-semibold tracking-tight">{unit.title}</h1>
-          <p className="mt-2 text-muted-foreground">Estimated study time: {unit.estimatedMinutes} minutes.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{unit.title}</h1>
+          <UnitMetaBar className="mt-4" estimatedMinutes={unit.estimatedMinutes} learnersLabel="6k learners" />
         </header>
 
 
@@ -90,7 +90,7 @@ export default async function UnitDetailPage({
           ))
         ) : (
           <>
-            <div className="flex h-[calc(100vh-340px)] items-center justify-center">
+            <div className="flex h-[calc(100vh-380px)] items-center justify-center">
               <div className="mx-auto max-w-[280px] xl:max-w-md text-center">
                 <Image
                   src="/unit-coming-soon.svg"
