@@ -65,7 +65,7 @@ export default async function UnitDetailPage({
         : 0;
 
   return (
-    <div className="grid gap-2 xl:grid-cols-[minmax(0,1fr)_232px] relative">
+    <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_232px] relative">
       <div className="space-y-5">
         <header className="border-b pb-4">
           <p className="text-sm font-medium text-muted-foreground">{unit.topic}</p>
@@ -90,36 +90,8 @@ export default async function UnitDetailPage({
           ))
         ) : (
           <>
-            <div className="flex h-[calc(100vh-400px)] items-center justify-center">
-              <div className="mx-auto max-w-md text-center">
-                <Image
-                  src="/unit-coming-soon.svg"
-                  alt="Unit coming soon"
-                  width={520}
-                  height={355}
-                  className="mx-auto h-auto w-full"
-                  priority
-                />
-                <h2 className="mt-6 text-2xl font-semibold tracking-tight">Unit comming soon</h2>
-                <p className="mt-2 text-muted-foreground">Content for this unit is being prepared.</p>
-              </div>
-            </div>
-            <div className="flex h-[calc(100vh-400px)] items-center justify-center">
-              <div className="mx-auto max-w-md text-center">
-                <Image
-                  src="/unit-coming-soon.svg"
-                  alt="Unit coming soon"
-                  width={520}
-                  height={355}
-                  className="mx-auto h-auto w-full"
-                  priority
-                />
-                <h2 className="mt-6 text-2xl font-semibold tracking-tight">Unit comming soon</h2>
-                <p className="mt-2 text-muted-foreground">Content for this unit is being prepared.</p>
-              </div>
-            </div>
-            <div className="flex h-[calc(100vh-400px)] items-center justify-center">
-              <div className="mx-auto max-w-md text-center">
+            <div className="flex h-[calc(100vh-340px)] items-center justify-center">
+              <div className="mx-auto max-w-[280px] xl:max-w-md text-center">
                 <Image
                   src="/unit-coming-soon.svg"
                   alt="Unit coming soon"
@@ -136,8 +108,8 @@ export default async function UnitDetailPage({
         )}
       </div>
 
-      <div className="xl:justify-self-end xl:border-l h-(100%+24px) py-2 -my-6 xl:-mr-6">
-        <div className="xl:sticky xl:top-24 xl:h-[calc(100vh-135px)] xl:w-[240px] xl:overflow-y-auto">
+      <div className="md:justify-self-end md:border-l h-(100%+24px) py-2 -my-6 md:-mr-6">
+        <div className="md:sticky md:top-24 md:h-[calc(100vh-135px)] md:w-[240px] md:overflow-y-auto">
         <UnitSectionsSidebar
           unitOrder={unit.order}
           progressStatus={sidebarProgressStatus}

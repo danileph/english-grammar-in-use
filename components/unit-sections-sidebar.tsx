@@ -67,7 +67,7 @@ export function UnitSectionsSidebar({
   }, [sections]);
 
   return (
-    <aside className="hidden xl:block">
+    <aside className="hidden md:block">
       <div className="rounded-2xl p-3 w-[240px]">
         <div className="mb-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
