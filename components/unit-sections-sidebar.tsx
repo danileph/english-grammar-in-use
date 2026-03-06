@@ -12,9 +12,10 @@ type UnitSectionItem = {
 
 type UnitSectionsSidebarProps = {
   sections: UnitSectionItem[];
+  unitOrder: number;
 };
 
-export function UnitSectionsSidebar({ sections }: UnitSectionsSidebarProps) {
+export function UnitSectionsSidebar({ sections, unitOrder }: UnitSectionsSidebarProps) {
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export function UnitSectionsSidebar({ sections }: UnitSectionsSidebarProps) {
   return (
     <aside className="hidden xl:block">
       <div className="sticky top-24 rounded-2xl p-3 w-[240px]">
+        <h2 className="mb-2 text-xl font-semibold tracking-tight">Unit {unitOrder}</h2>
         <SidebarMenu title="Unit sections">
           {sections.map((section) => {
             const isActive = section.id === activeId;

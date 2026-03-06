@@ -80,7 +80,7 @@ export default async function UnitDetailPage({
         <header className="border-b pb-4">
           <p className="text-sm font-medium text-muted-foreground">{unit.topic}</p>
           <h1 className="text-3xl font-semibold tracking-tight">
-            Unit {unit.order}: {unit.title}
+            {unit.title}
           </h1>
           <p className="mt-2 text-muted-foreground">
             Estimated study time: {unit.estimatedMinutes} minutes.
@@ -110,6 +110,7 @@ export default async function UnitDetailPage({
 
       <div className="xl:justify-self-end border-l min-h-[calc(100vh-135px)] overflow-y-auto py-2 -my-6 -mr-6">
         <UnitSectionsSidebar
+          unitOrder={unit.order}
           sections={sections.map((section) => ({
             id: section.id,
             label: section.label,

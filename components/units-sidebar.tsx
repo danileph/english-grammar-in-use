@@ -44,14 +44,14 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
   return (
     <aside className="bg-white/85">
       <div className="border-b p-6">
-        <h2 className="text-2xl font-semibold tracking-tight">Units</h2>
-        <div className="relative mt-4">
+        <h2 className="text-xl font-semibold tracking-tight">Units</h2>
+        <div className="relative mt-2">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search units..."
-            className="h-12 rounded-2xl border bg-background pl-9 text-base"
+            className="rounded-xl border bg-background pl-9 text-base"
           />
         </div>
       </div>
