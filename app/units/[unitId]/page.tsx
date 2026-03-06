@@ -74,6 +74,14 @@ export default async function UnitDetailPage({
     },
   ] as const;
 
+  const sidebarProgressStatus = progress?.status ?? "NOT_STARTED";
+  const sidebarProgressPercentage =
+    sidebarProgressStatus === "COMPLETED"
+      ? 100
+      : sidebarProgressStatus === "IN_PROGRESS"
+        ? progress?.accuracy ?? 35
+        : 0;
+
   return (
     <div className="grid gap-2 xl:grid-cols-[minmax(0,1fr)_232px]">
       <div className="space-y-5">
@@ -111,6 +119,8 @@ export default async function UnitDetailPage({
       <div className="xl:justify-self-end border-l min-h-[calc(100vh-135px)] overflow-y-auto py-2 -my-6 -mr-6">
         <UnitSectionsSidebar
           unitOrder={unit.order}
+          progressStatus={sidebarProgressStatus}
+          progressPercentage={sidebarProgressPercentage}
           sections={sections.map((section) => ({
             id: section.id,
             label: section.label,
