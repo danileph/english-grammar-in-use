@@ -45,7 +45,7 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
   return (
     <aside className="bg-white/85">
       <div className="border-b p-6">
-        <h2 className="text-4xl font-semibold tracking-tight">Units</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Units</h2>
         <div className="relative mt-4">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -61,7 +61,7 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
         {filteredGroups.map((group) => (
           <section key={group.topic} className="border-b py-3 last:border-b-0">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-[38px] font-semibold leading-none tracking-tight">{group.topic}</h3>
+              <h3 className="text-lg font-semibold leading-none tracking-tight">{group.topic}</h3>
               <ChevronDown className="h-5 w-5 text-muted-foreground" />
             </div>
             <div className="space-y-1">
@@ -77,19 +77,15 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
                       isActive ? "bg-secondary/70" : "hover:bg-muted/70",
                     )}
                   >
-                    {unit.status === "IN_PROGRESS" ? (
-                      <CircleArrowDown className="h-6 w-6 shrink-0 text-muted-foreground" />
-                    ) : (
-                      <span
+                    <span
                         className={cn(
-                          "inline-flex h-7 min-w-7 items-center justify-center rounded-md border bg-background px-1 text-sm font-semibold text-muted-foreground",
-                          isActive && "border-primary/30 bg-primary/15 text-primary",
+                            "inline-flex h-7 min-w-7 items-center justify-center rounded-md border bg-background px-1 text-sm font-semibold text-muted-foreground",
+                            isActive && "border-primary/30 bg-primary/15 text-primary",
                         )}
-                      >
+                    >
                         {unit.order}
-                      </span>
-                    )}
-                    <span className="line-clamp-2 flex-1 text-xl leading-tight">{unit.title}</span>
+                    </span>
+                    <span className="line-clamp-2 flex-1 text-md leading-tight">{unit.title}</span>
                   </Link>
                 );
               })}
