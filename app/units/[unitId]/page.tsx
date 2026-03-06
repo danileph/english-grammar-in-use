@@ -70,7 +70,12 @@ export default async function UnitDetailPage({
         <header className="border-b pb-4">
           <p className="text-sm font-medium text-muted-foreground">{unit.topic}</p>
           <h1 className="text-2xl font-semibold tracking-tight">{unit.title}</h1>
-          <UnitMetaBar className="mt-4" estimatedMinutes={unit.estimatedMinutes} learnersLabel="6k learners" />
+          <UnitMetaBar
+            className="mt-4"
+            estimatedMinutes={unit.estimatedMinutes}
+            learnersLabel="6k learners"
+            practiceHref={`/units/${unit.order}/practice`}
+          />
         </header>
 
 
