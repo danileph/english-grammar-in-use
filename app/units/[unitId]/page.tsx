@@ -75,7 +75,7 @@ export default async function UnitDetailPage({
   ] as const;
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr),240px]">
+    <div className="grid gap-2 xl:grid-cols-[minmax(0,1fr)_232px]">
       <div className="space-y-5">
         <header className="border-b pb-4">
           <p className="text-sm font-medium text-muted-foreground">{unit.topic}</p>
@@ -97,9 +97,9 @@ export default async function UnitDetailPage({
           <section key={section.id} id={section.id} className="scroll-mt-24">
             <Card className="space-y-4 rounded-2xl border p-6">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-muted/50 text-sm font-semibold">
-                  {section.label}
-                </span>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-muted/50 text-sm font-semibold">
+                {section.label}
+              </span>
                 <h2 className="text-xl font-semibold tracking-tight">{section.title}</h2>
               </div>
               <p className="text-muted-foreground">{section.body}</p>
@@ -108,13 +108,15 @@ export default async function UnitDetailPage({
         ))}
       </div>
 
-      <UnitSectionsSidebar
-        sections={sections.map((section) => ({
-          id: section.id,
-          label: section.label,
-          title: section.title,
-        }))}
-      />
+      <div className="xl:justify-self-end border-l min-h-[calc(100vh-135px)] overflow-y-auto py-2 -my-6 -mr-6">
+        <UnitSectionsSidebar
+          sections={sections.map((section) => ({
+            id: section.id,
+            label: section.label,
+            title: section.title,
+          }))}
+        />
+      </div>
     </div>
   );
 }

@@ -63,7 +63,7 @@ export default async function UnitsLayout({
     <main className="mx-auto w-full max-w-[1400px] px-4 pb-8 pt-5">
       <div className="overflow-hidden rounded-[28px] border bg-white/70 shadow-sm">
         <div className="min-h-[calc(100vh-8.5rem)] flex flex-col lg:flex-row">
-          <div className="lg:w-[330px] lg:shrink-0 lg:border-r">
+          <div className="lg:w-[260px] lg:shrink-0 lg:border-r">
             <UnitsSidebar groups={groups} />
           </div>
           <section className="min-h-[calc(100vh-8.5rem)] flex-1 border-t bg-white/55 p-4 sm:p-6 lg:border-t-0">

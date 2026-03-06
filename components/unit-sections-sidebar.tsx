@@ -52,7 +52,7 @@ export function UnitSectionsSidebar({ sections }: UnitSectionsSidebarProps) {
 
   return (
     <aside className="hidden xl:block">
-      <div className="sticky top-24 rounded-2xl border bg-white p-3 shadow-sm">
+      <div className="sticky top-24 rounded-2xl p-3 w-[240px]">
         <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
           Unit sections
         </p>
@@ -73,7 +73,7 @@ export function UnitSectionsSidebar({ sections }: UnitSectionsSidebarProps) {
               >
                 <span
                   className={cn(
-                    "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border text-xs font-semibold",
+                    "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-xs font-semibold",
                     isActive
                       ? "border-primary/35 bg-primary/10 text-primary"
                       : "border-border bg-background text-muted-foreground",
