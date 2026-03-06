@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, Timer } from "lucide-react";
+import { BookOpen, Pencil, Timer } from "lucide-react";
 import type { ProgressStatus, UnitItem } from "@/types";
 
 import { Badge } from "@/components/ui/badge";
@@ -57,23 +57,23 @@ export function UnitCard({ unit, progress }: UnitCardProps) {
           <p className="text-sm text-muted-foreground">Last accuracy: {progress.accuracy}%</p>
         )}
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2">
+      <CardFooter className="flex flex-col gap-2">
         <Button
-          variant="outline"
-          size="sm"
-          className="min-w-[7.5rem] flex-1"
-          onClick={() => updateProgress(unit.id, { status: "IN_PROGRESS" })}
+            variant="secondary"
+            size="sm"
+            className="w-full"
+            onClick={() => updateProgress(unit.id, { status: "COMPLETED" })}
         >
-          <Circle className="h-4 w-4" />
+          <Pencil className="h-4 w-4" />
           Practice
         </Button>
         <Button
           size="sm"
-          className="min-w-[9.25rem] flex-1"
-          onClick={() => updateProgress(unit.id, { status: "COMPLETED" })}
+          className="w-full"
+          onClick={() => updateProgress(unit.id, { status: "IN_PROGRESS" })}
         >
-          <CheckCircle2 className="h-4 w-4" />
-          Mark complete
+          <BookOpen className="h-4 w-4" />
+          Learn
         </Button>
       </CardFooter>
     </Card>
