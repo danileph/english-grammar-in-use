@@ -15,7 +15,7 @@ export function ExerciseProgressSidebar({ completed, total, steps }: ExercisePro
   const progressValue = total > 0 ? (completed / total) * 100 : 0;
 
   return (
-    <aside className="rounded-2xl border bg-white/65 md:sticky md:top-24">
+    <aside className="rounded-2xl bg-white/65 md:w-[240px]">
       <div className="border-b p-6">
         <h2 className="text-xl font-semibold tracking-tight">Exercises</h2>
         <p className="mt-2 text-lg text-muted-foreground">

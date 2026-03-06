@@ -40,8 +40,8 @@ export function PracticePageLayout({
         <PracticeBottomBar current={data.currentExerciseNumber} total={data.totalExercises} />
       </div>
 
-      <div className="md:border-l md:-my-6 md:-mr-6 md:py-2 md:pl-2">
-        <div className="md:sticky md:top-24">
+      <div className="h-(100%+24px) -my-6 py-2 md:justify-self-end md:border-l md:-mr-6">
+        <div className="md:sticky md:top-24 md:h-[calc(100vh-135px)] md:w-[240px] md:overflow-y-auto">
           <ExerciseProgressSidebar
             completed={data.completedExercises}
             total={data.totalExercises}
