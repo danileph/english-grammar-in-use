@@ -65,7 +65,7 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
             </div>
             <div className="space-y-1">
               {group.units.map((unit) => {
-                const href = `/units/${unit.id}`;
+                const href = `/units/${unit.order}`;
                 const isActive = pathname === href;
                 return (
                   <SidebarMenuLinkItem

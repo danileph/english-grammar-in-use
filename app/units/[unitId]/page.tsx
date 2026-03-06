@@ -12,40 +12,45 @@ export default async function UnitDetailPage({
   params: Promise<{ unitId: string }>;
 }) {
   const { unitId } = await params;
+  const isNumericUnitId = /^\d+$/.test(unitId);
+  const unitOrder = isNumericUnitId ? Number.parseInt(unitId, 10) : Number.NaN;
   const session = await auth();
 
   if (!session?.user?.id) {
     redirect("/sign-in");
   }
 
-  const [unit, progress] = await Promise.all([
-    db.unit.findUnique({
-      where: { id: unitId },
-      select: {
-        id: true,
-        title: true,
-        topic: true,
-        order: true,
-        estimatedMinutes: true,
-      },
-    }),
-    db.progress.findUnique({
-      where: {
-        userId_unitId: {
-          userId: session.user.id,
-          unitId,
-        },
-      },
-      select: {
-        status: true,
-        accuracy: true,
-      },
-    }),
-  ]);
+  if (Number.isNaN(unitOrder) || unitOrder < 1) {
+    notFound();
+  }
+
+  const unit = await db.unit.findUnique({
+    where: { order: unitOrder },
+    select: {
+      id: true,
+      title: true,
+      topic: true,
+      order: true,
+      estimatedMinutes: true,
+    },
+  });
 
   if (!unit) {
     notFound();
   }
+
+  const progress = await db.progress.findUnique({
+    where: {
+      userId_unitId: {
+        userId: session.user.id,
+        unitId: unit.id,
+      },
+    },
+    select: {
+      status: true,
+      accuracy: true,
+    },
+  });
 
   const sections = [
     {
