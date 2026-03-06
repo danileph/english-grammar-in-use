@@ -68,7 +68,7 @@ export function UnitSectionsSidebar({
 
   return (
     <aside className="hidden xl:block">
-      <div className="sticky top-24 rounded-2xl p-3 w-[240px]">
+      <div className="rounded-2xl p-3 w-[240px]">
         <div className="mb-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
             <h2 className="text-xl font-semibold tracking-tight">Unit {unitOrder}</h2>

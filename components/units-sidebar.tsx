@@ -42,7 +42,7 @@ export function UnitsSidebar({ groups }: UnitsSidebarProps) {
   }, [groups, query]);
 
   return (
-    <aside className="bg-white/85">
+    <aside className="bg-white/85 sticky top-25 rounded-2xl">
       <div className="border-b p-6">
         <h2 className="text-xl font-semibold tracking-tight">Units</h2>
         <div className="relative mt-2">
