@@ -57,7 +57,6 @@ export default async function UnitsLayout({
       status: progressMap.get(unit.id) ?? "NOT_STARTED",
     })),
   }));
-  groups.push({ topic: "Relative clauses", units: [] });
 
   return (
     <main className="mx-auto w-full max-w-[1400px] px-4 pb-8 pt-5">
