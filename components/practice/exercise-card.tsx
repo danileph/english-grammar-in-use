@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { PracticeExerciseItem } from "@/lib/mock-practice";
 
 import { ExerciseItem } from "@/components/practice/exercise-item";
-import { buildSentenceShell } from "@/components/practice/inputs/sentence-gap-input";
+import { buildSentenceShell, extractGapValueFromSentence } from "@/components/practice/inputs/sentence-gap-input";
 import { useWordBankUsage } from "@/components/practice/hooks/use-word-bank-usage";
 import { WordBank } from "@/components/practice/word-bank";
 import { Badge } from "@/components/ui/badge";
@@ -28,21 +28,41 @@ export function ExerciseCard({
   words,
   items,
 }: ExerciseCardProps) {
+  const blankContexts = useMemo(
+    () =>
+      items.flatMap((item) =>
+        item.blanks.map((blank, blankIndex) => ({
+          blankId: blank.id,
+          prefix: item.parts[blankIndex] ?? "",
+          suffix: item.parts[blankIndex + 1] ?? "",
+          gapMarker: blank.placeholder || "..........",
+        })),
+      ),
+    [items],
+  );
+
   const [answersByBlankId, setAnswersByBlankId] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
 
-    for (const item of items) {
-      for (const [blankIndex, blank] of item.blanks.entries()) {
-        const prefix = item.parts[blankIndex] ?? "";
-        const suffix = item.parts[blankIndex + 1] ?? "";
-        initial[blank.id] = buildSentenceShell(prefix, suffix, blank.placeholder || "..........");
-      }
+    for (const blank of blankContexts) {
+      initial[blank.blankId] = buildSentenceShell(blank.prefix, blank.suffix, blank.gapMarker);
     }
 
     return initial;
   });
 
-  const answerTexts = useMemo(() => Object.values(answersByBlankId), [answersByBlankId]);
+  const answerTexts = useMemo(
+    () =>
+      blankContexts.map((blank) =>
+        extractGapValueFromSentence({
+          value: answersByBlankId[blank.blankId] ?? "",
+          prefix: blank.prefix,
+          suffix: blank.suffix,
+          gapMarker: blank.gapMarker,
+        }),
+      ),
+    [answersByBlankId, blankContexts],
+  );
   const usedWords = useWordBankUsage(words, answerTexts);
 
   const handleBlankValueChange = (blankId: string, value: string) => {

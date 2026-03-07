@@ -17,8 +17,51 @@ type SentenceGapInputProps = {
   gapMarker?: string;
 };
 
+export function normalizeShellPart(value: string) {
+  return value.replace(/\s*\^\s*/g, " ");
+}
+
 export function buildSentenceShell(prefix: string, suffix: string, gapMarker: string) {
-  return `${prefix}${gapMarker}${suffix}`;
+  return `${normalizeShellPart(prefix)}${gapMarker}${normalizeShellPart(suffix)}`;
+}
+
+export function buildSentenceWithoutGap(prefix: string, suffix: string) {
+  return `${normalizeShellPart(prefix)}${normalizeShellPart(suffix)}`;
+}
+
+type ExtractGapValueParams = {
+  value: string;
+  prefix: string;
+  suffix: string;
+  gapMarker: string;
+};
+
+export function extractGapValueFromSentence({ value, prefix, suffix, gapMarker }: ExtractGapValueParams) {
+  const shellWithMarker = buildSentenceShell(prefix, suffix, gapMarker);
+  const shellWithoutMarker = buildSentenceWithoutGap(prefix, suffix);
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return "";
+  }
+
+  if (trimmedValue === shellWithMarker.trim() || trimmedValue === shellWithoutMarker.trim()) {
+    return "";
+  }
+
+  const normalizedPrefix = normalizeShellPart(prefix);
+  const normalizedSuffix = normalizeShellPart(suffix);
+  let extractedValue = value;
+
+  if (normalizedPrefix && extractedValue.startsWith(normalizedPrefix)) {
+    extractedValue = extractedValue.slice(normalizedPrefix.length);
+  }
+
+  if (normalizedSuffix && extractedValue.endsWith(normalizedSuffix)) {
+    extractedValue = extractedValue.slice(0, -normalizedSuffix.length);
+  }
+
+  return extractedValue.replace(gapMarker, "").trim();
 }
 
 export function SentenceGapInput({
@@ -30,8 +73,10 @@ export function SentenceGapInput({
   className,
   gapMarker = "..........",
 }: SentenceGapInputProps) {
+  const normalizedPrefix = normalizeShellPart(prefix);
+  const normalizedSuffix = normalizeShellPart(suffix);
   const shellWithMarker = buildSentenceShell(prefix, suffix, gapMarker);
-  const shellWithoutMarker = `${prefix}${suffix}`;
+  const shellWithoutMarker = buildSentenceWithoutGap(prefix, suffix);
   const focusGap = useGapCaretPosition();
   const touchedRef = useRef(false);
 
@@ -51,7 +96,7 @@ export function SentenceGapInput({
           onChange(shellWithoutMarker);
         }
 
-        focusGap({ input: event.currentTarget, prefix, suffix });
+        focusGap({ input: event.currentTarget, prefix: normalizedPrefix, suffix: normalizedSuffix });
       }}
       onBlur={() => {
         const trimmed = value.trim();

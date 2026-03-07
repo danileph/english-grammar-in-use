@@ -11,7 +11,7 @@ type ExerciseItemProps = {
 export function ExerciseItem({ item, valuesByBlankId, onBlankValueChange }: ExerciseItemProps) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 inline-flex min-h-6 min-w-6 items-center justify-center rounded-md border bg-secondary/70 px-2 text-xs font-semibold text-primary">
+      <span className="mt-0.5 inline-flex min-h-6 min-w-6 items-center justify-center rounded-md border px-2 text-xs ">
         {item.label}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
