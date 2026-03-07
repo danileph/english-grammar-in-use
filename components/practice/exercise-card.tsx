@@ -11,6 +11,28 @@ import { WordBank } from "@/components/practice/word-bank";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 
+function trimToGapSentence(prefix: string, suffix: string) {
+  let nextPrefix = prefix;
+  let nextSuffix = suffix;
+
+  const lastSentenceBreak = Math.max(prefix.lastIndexOf(". "), prefix.lastIndexOf("? "), prefix.lastIndexOf("! "));
+  if (lastSentenceBreak >= 0) {
+    nextPrefix = prefix.slice(lastSentenceBreak + 2);
+  }
+
+  const orIndex = nextPrefix.lastIndexOf("(or ");
+  if (orIndex >= 0) {
+    nextPrefix = nextPrefix.slice(orIndex + "(or ".length);
+  }
+
+  const suffixOrIndex = nextSuffix.indexOf("(or ");
+  if (suffixOrIndex >= 0) {
+    nextSuffix = nextSuffix.slice(0, suffixOrIndex);
+  }
+
+  return { prefix: nextPrefix, suffix: nextSuffix };
+}
+
 type ExerciseCardProps = {
   exerciseNumber?: string;
   instruction: string;
@@ -31,12 +53,18 @@ export function ExerciseCard({
   const blankContexts = useMemo(
     () =>
       items.flatMap((item) =>
-        item.blanks.map((blank, blankIndex) => ({
-          blankId: blank.id,
-          prefix: item.parts[blankIndex] ?? "",
-          suffix: item.parts[blankIndex + 1] ?? "",
-          gapMarker: blank.placeholder || "..........",
-        })),
+        item.blanks.map((blank, blankIndex) => {
+          const rawPrefix = item.parts[blankIndex] ?? "";
+          const rawSuffix = item.parts[blankIndex + 1] ?? "";
+          const { prefix, suffix } = trimToGapSentence(rawPrefix, rawSuffix);
+
+          return {
+            blankId: blank.id,
+            prefix,
+            suffix,
+            gapMarker: blank.placeholder || "..........",
+          };
+        }),
       ),
     [items],
   );
