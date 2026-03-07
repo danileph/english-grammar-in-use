@@ -31,7 +31,9 @@ export function PracticePageLayout({
         />
 
         <ExerciseCard
+          exerciseNumber={data.steps[0]?.id}
           instruction={data.instruction}
+          practiceSectionLabel={data.practiceSectionLabel}
           wordBankLabel={data.wordBankLabel}
           words={data.wordBank}
           items={data.exerciseItems}

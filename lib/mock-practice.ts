@@ -24,6 +24,7 @@ export type PracticeMockData = {
   lessonTitleLineOne: string;
   lessonTitleLineTwo: string;
   instruction: string;
+  practiceSectionLabel?: string;
   wordBankLabel: string;
   wordBank: string[];
   exerciseItems: PracticeExerciseItem[];
@@ -40,6 +41,7 @@ const unit1Exercise11: PracticeMockData = {
   lessonTitleLineTwo: "Exercise 1.1",
   instruction:
     "Complete each pair of sentences using the same verb (in a question form or negative if necessary) from the box. Use the present continuous; if this is not possible, use the present simple. Use ^ to add any words outside the gap and use contracted forms where appropriate.",
+  practiceSectionLabel: "A & B",
   wordBankLabel: "A & B",
   wordBank: ["attract", "consist of", "doubt", "feel", "fit", "have", "like", "look", "measure", "sound"],
   completedExercises: 0,
