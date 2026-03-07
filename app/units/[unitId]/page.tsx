@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
+import { UnitContentSectionCard } from "@/components/unit-content/unit-content-section-card";
 import { UnitSectionsSidebar } from "@/components/unit-sections-sidebar";
 import { UnitMetaBar } from "@/components/unit-meta-bar";
-import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getUnitContentByOrder } from "@/lib/unit-content";
 
 export default async function UnitDetailPage({
   params,
@@ -53,7 +54,7 @@ export default async function UnitDetailPage({
     },
   });
 
-  const sections: Array<{ id: string; label: string; title: string; body: string }> = [];
+  const sections = getUnitContentByOrder(unit.order)?.sections ?? [];
   const hasUnitContent = sections.length > 0;
 
   const sidebarProgressStatus = progress?.status ?? "NOT_STARTED";
@@ -80,19 +81,7 @@ export default async function UnitDetailPage({
 
 
         {hasUnitContent ? (
-          sections.map((section) => (
-            <section key={section.id} id={section.id} className="scroll-mt-24">
-              <Card className="space-y-4 rounded-2xl border p-6">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-muted/50 text-sm font-semibold">
-                    {section.label}
-                  </span>
-                  <h2 className="text-xl font-semibold tracking-tight">{section.title}</h2>
-                </div>
-                <p className="text-muted-foreground">{section.body}</p>
-              </Card>
-            </section>
-          ))
+          sections.map((section) => <UnitContentSectionCard key={section.id} section={section} />)
         ) : (
           <>
             <div className="flex h-[calc(100vh-380px)] items-center justify-center">
