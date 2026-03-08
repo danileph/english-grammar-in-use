@@ -5,33 +5,11 @@ import { useMemo, useState } from "react";
 import type { PracticeExerciseItem } from "@/lib/mock-practice";
 
 import { ExerciseItem } from "@/components/practice/exercise-item";
-import { buildSentenceShell, extractGapValueFromSentence } from "@/components/practice/inputs/sentence-gap-input";
+import { buildSentenceShell, extractGapValuesFromSentence } from "@/components/practice/inputs/sentence-gap-input";
 import { useWordBankUsage } from "@/components/practice/hooks/use-word-bank-usage";
 import { WordBank } from "@/components/practice/word-bank";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-
-function trimToGapSentence(prefix: string, suffix: string) {
-  let nextPrefix = prefix;
-  let nextSuffix = suffix;
-
-  const lastSentenceBreak = Math.max(prefix.lastIndexOf(". "), prefix.lastIndexOf("? "), prefix.lastIndexOf("! "));
-  if (lastSentenceBreak >= 0) {
-    nextPrefix = prefix.slice(lastSentenceBreak + 2);
-  }
-
-  const orIndex = nextPrefix.lastIndexOf("(or ");
-  if (orIndex >= 0) {
-    nextPrefix = nextPrefix.slice(orIndex + "(or ".length);
-  }
-
-  const suffixOrIndex = nextSuffix.indexOf("(or ");
-  if (suffixOrIndex >= 0) {
-    nextSuffix = nextSuffix.slice(0, suffixOrIndex);
-  }
-
-  return { prefix: nextPrefix, suffix: nextSuffix };
-}
 
 type ExerciseCardProps = {
   exerciseNumber?: string;
@@ -95,53 +73,53 @@ export function ExerciseCard({
     }));
   }, [items]);
 
-  const blankContexts = useMemo(
+  const itemContexts = useMemo(
     () =>
-      items.flatMap((item) =>
-        item.blanks.map((blank, blankIndex) => {
-          const rawPrefix = item.parts[blankIndex] ?? "";
-          const rawSuffix = item.parts[blankIndex + 1] ?? "";
-          const { prefix, suffix } = trimToGapSentence(rawPrefix, rawSuffix);
-
-          return {
-            blankId: blank.id,
-            prefix,
-            suffix,
-            gapMarker: blank.placeholder || "..........",
-          };
-        }),
-      ),
+      items.map((item) => ({
+        itemId: item.id,
+        parts: item.parts,
+        blankIds: item.blanks.map((blank) => blank.id),
+        gapMarkers: item.blanks.map((blank) => blank.placeholder || ".........."),
+      })),
     [items],
   );
 
-  const [answersByBlankId, setAnswersByBlankId] = useState<Record<string, string>>(() => {
+  const [answersByItemId, setAnswersByItemId] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
 
-    for (const blank of blankContexts) {
-      initial[blank.blankId] = buildSentenceShell(blank.prefix, blank.suffix, blank.gapMarker);
+    for (const itemContext of itemContexts) {
+      initial[itemContext.itemId] = buildSentenceShell(itemContext.parts, itemContext.gapMarkers);
     }
 
     return initial;
   });
 
   const answerTexts = useMemo(
-    () =>
-      blankContexts.map((blank) =>
-        extractGapValueFromSentence({
-          value: answersByBlankId[blank.blankId] ?? "",
-          prefix: blank.prefix,
-          suffix: blank.suffix,
-          gapMarker: blank.gapMarker,
-        }),
-      ),
-    [answersByBlankId, blankContexts],
+    () => {
+      const answersByBlankId: Record<string, string> = {};
+
+      for (const itemContext of itemContexts) {
+        const values = extractGapValuesFromSentence({
+          value: answersByItemId[itemContext.itemId] ?? "",
+          parts: itemContext.parts,
+          gapMarkers: itemContext.gapMarkers,
+        });
+
+        itemContext.blankIds.forEach((blankId, index) => {
+          answersByBlankId[blankId] = values[index] ?? "";
+        });
+      }
+
+      return items.flatMap((item) => item.blanks.map((blank) => answersByBlankId[blank.id] ?? ""));
+    },
+    [answersByItemId, itemContexts, items],
   );
   const usedWords = useWordBankUsage(words, answerTexts);
 
-  const handleBlankValueChange = (blankId: string, value: string) => {
-    setAnswersByBlankId((current) => ({
+  const handleItemValueChange = (itemId: string, value: string) => {
+    setAnswersByItemId((current) => ({
       ...current,
-      [blankId]: value,
+      [itemId]: value,
     }));
   };
 
@@ -182,8 +160,8 @@ export function ExerciseCard({
               <ExerciseItem
                 key={single.item.id}
                 item={single.item}
-                valuesByBlankId={answersByBlankId}
-                onBlankValueChange={handleBlankValueChange}
+                valuesByItemId={answersByItemId}
+                onItemValueChange={handleItemValueChange}
               />
             );
           }
@@ -202,8 +180,8 @@ export function ExerciseCard({
                     <div className="min-w-0 flex-1">
                       <ExerciseItem
                         item={entry.item}
-                        valuesByBlankId={answersByBlankId}
-                        onBlankValueChange={handleBlankValueChange}
+                        valuesByItemId={answersByItemId}
+                        onItemValueChange={handleItemValueChange}
                         hideItemLabel
                       />
                     </div>
