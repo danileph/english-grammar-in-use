@@ -42,6 +42,25 @@ type ExerciseCardProps = {
   items: PracticeExerciseItem[];
 };
 
+type GroupedExerciseItems = {
+  key: string;
+  numberLabel: string | null;
+  entries: Array<{ item: PracticeExerciseItem; subLabel: string | null }>;
+};
+
+function parseExerciseLabel(label: string) {
+  const match = label.match(/^(\d+)([a-z])$/i);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    numberLabel: match[1],
+    subLabel: match[2].toLowerCase(),
+  };
+}
+
 export function ExerciseCard({
   exerciseNumber,
   instruction,
@@ -50,6 +69,32 @@ export function ExerciseCard({
   words,
   items,
 }: ExerciseCardProps) {
+  const groupedItems = useMemo<GroupedExerciseItems[]>(() => {
+    const groups = new Map<string, GroupedExerciseItems>();
+
+    for (const item of items) {
+      const parsed = parseExerciseLabel(item.label);
+      const groupKey = parsed?.numberLabel ?? item.id;
+      const currentGroup = groups.get(groupKey);
+
+      if (currentGroup) {
+        currentGroup.entries.push({ item, subLabel: parsed?.subLabel ?? null });
+        continue;
+      }
+
+      groups.set(groupKey, {
+        key: groupKey,
+        numberLabel: parsed?.numberLabel ?? null,
+        entries: [{ item, subLabel: parsed?.subLabel ?? null }],
+      });
+    }
+
+    return [...groups.values()].map((group) => ({
+      ...group,
+      entries: [...group.entries].sort((a, b) => (a.subLabel ?? "").localeCompare(b.subLabel ?? "")),
+    }));
+  }, [items]);
+
   const blankContexts = useMemo(
     () =>
       items.flatMap((item) =>
@@ -129,14 +174,45 @@ export function ExerciseCard({
       </div>
 
       <div className="mt-5 space-y-4 overflow-y-auto pr-1">
-        {items.map((item) => (
-          <ExerciseItem
-            key={item.id}
-            item={item}
-            valuesByBlankId={answersByBlankId}
-            onBlankValueChange={handleBlankValueChange}
-          />
-        ))}
+        {groupedItems.map((group) => {
+          if (!group.numberLabel) {
+            const single = group.entries[0];
+
+            return (
+              <ExerciseItem
+                key={single.item.id}
+                item={single.item}
+                valuesByBlankId={answersByBlankId}
+                onBlankValueChange={handleBlankValueChange}
+              />
+            );
+          }
+
+          return (
+            <div key={group.key} className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex min-h-6 min-w-6 items-center justify-center rounded-md border px-2 text-xs">
+                {group.numberLabel}
+              </span>
+              <div className="min-w-0 flex-1 space-y-4">
+                {group.entries.map((entry) => (
+                  <div key={entry.item.id} className="flex items-start gap-2">
+                    {entry.subLabel ? (
+                      <span className="pt-0.5 text-base font-medium text-foreground/90">{entry.subLabel})</span>
+                    ) : null}
+                    <div className="min-w-0 flex-1">
+                      <ExerciseItem
+                        item={entry.item}
+                        valuesByBlankId={answersByBlankId}
+                        onBlankValueChange={handleBlankValueChange}
+                        hideItemLabel
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </Card>
   );

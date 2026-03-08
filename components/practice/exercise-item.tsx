@@ -38,14 +38,17 @@ type ExerciseItemProps = {
   item: PracticeExerciseItem;
   valuesByBlankId: Record<string, string>;
   onBlankValueChange: (blankId: string, value: string) => void;
+  hideItemLabel?: boolean;
 };
 
-export function ExerciseItem({ item, valuesByBlankId, onBlankValueChange }: ExerciseItemProps) {
+export function ExerciseItem({ item, valuesByBlankId, onBlankValueChange, hideItemLabel = false }: ExerciseItemProps) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 inline-flex min-h-6 min-w-6 items-center justify-center rounded-md border px-2 text-xs ">
-        {item.label}
-      </span>
+      {!hideItemLabel ? (
+        <span className="mt-0.5 inline-flex min-h-6 min-w-6 items-center justify-center rounded-md border px-2 text-xs ">
+          {item.label}
+        </span>
+      ) : null}
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         {item.blanks.map((blank, blankIndex) => {
           const rawPrefix = item.parts[blankIndex] ?? "";
