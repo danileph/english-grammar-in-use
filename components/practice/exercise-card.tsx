@@ -151,7 +151,7 @@ export function ExerciseCard({
         <WordBank label={wordBankLabel} words={words} usedWords={usedWords} />
       </div>
 
-      <div className="mt-5 space-y-4 overflow-y-auto pr-1">
+      <div className="mt-5 space-y-4 pr-1">
         {groupedItems.map((group) => {
           if (!group.numberLabel) {
             const single = group.entries[0];
