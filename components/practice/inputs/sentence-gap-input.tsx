@@ -151,7 +151,7 @@ export function SentenceGapInput({
         }
       }}
       className={cn(
-        "!w-auto h-11 max-w-full rounded-lg border-none bg-background px-2 py-1 h-8 text-md text-foreground/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]",
+        " h-11 max-w-full rounded-lg border-none bg-background px-2 py-1 h-8 text-md text-foreground/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]",
         className,
       )}
       style={{
