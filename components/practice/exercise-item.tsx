@@ -66,7 +66,7 @@ export function ExerciseItem({ item, valuesByBlankId, onBlankValueChange, hideIt
                 value={valuesByBlankId[blank.id] ?? ""}
                 onChange={(nextValue) => onBlankValueChange(blank.id, nextValue)}
                 gapMarker={blank.placeholder || ".........."}
-                className="shrink-0"
+                className="min-w-0 flex-1"
               />
             </div>
           );

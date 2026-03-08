@@ -1,11 +1,10 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
-import { useGapCaretPosition } from "@/components/practice/hooks/use-gap-caret-position";
 
 type SentenceGapInputProps = {
   id: string;
@@ -27,6 +26,10 @@ export function buildSentenceShell(prefix: string, suffix: string, gapMarker: st
 
 export function buildSentenceWithoutGap(prefix: string, suffix: string) {
   return `${normalizeShellPart(prefix)}${normalizeShellPart(suffix)}`;
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 type ExtractGapValueParams = {
@@ -73,94 +76,80 @@ export function SentenceGapInput({
   className,
   gapMarker = "..........",
 }: SentenceGapInputProps) {
-  const normalizedPrefix = normalizeShellPart(prefix);
-  const normalizedSuffix = normalizeShellPart(suffix);
   const shellWithMarker = buildSentenceShell(prefix, suffix, gapMarker);
   const shellWithoutMarker = buildSentenceWithoutGap(prefix, suffix);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [minInputWidth, setMinInputWidth] = useState<number | null>(null);
-  const [inputWidth, setInputWidth] = useState<number | null>(null);
-  const focusGap = useGapCaretPosition();
-  const touchedRef = useRef(false);
+  const controlledValue = value || shellWithMarker;
 
-  useLayoutEffect(() => {
-    if (!inputRef.current) {
-      return;
-    }
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        blockquote: false,
+        codeBlock: false,
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
+        horizontalRule: false,
+        hardBreak: false,
+      }),
+    ],
+    content: `<p>${escapeHtml(controlledValue)}</p>`,
+    editorProps: {
+      attributes: {
+        id,
+        spellcheck: "false",
+        autocomplete: "off",
+        class:
+          "h-auto min-h-8 w-full rounded-lg border-none bg-background px-2 py-1 text-md text-foreground/90 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] whitespace-pre-wrap break-words",
+      },
+    },
+    onFocus: ({ editor: currentEditor }) => {
+      const plainText = currentEditor.getText();
+      const gapStartIndex = plainText.indexOf(gapMarker);
 
-    const input = inputRef.current;
-    const styles = window.getComputedStyle(input);
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    if (!context) {
-      return;
-    }
-
-    context.font = styles.font;
-
-    const letterSpacing = Number.parseFloat(styles.letterSpacing);
-    const safeLetterSpacing = Number.isFinite(letterSpacing) ? letterSpacing : 0;
-    const horizontalSpace =
-      Number.parseFloat(styles.paddingLeft) +
-      Number.parseFloat(styles.paddingRight) +
-      Number.parseFloat(styles.borderLeftWidth) +
-      Number.parseFloat(styles.borderRightWidth) +
-      4;
-
-    const measure = (text: string) => {
-      if (!text) {
-        return 0;
+      if (gapStartIndex >= 0) {
+        currentEditor.commands.setTextSelection({
+          from: gapStartIndex + 1,
+          to: gapStartIndex + gapMarker.length + 1,
+        });
+        return;
       }
 
-      return context.measureText(text).width + Math.max(0, text.length - 1) * safeLetterSpacing;
-    };
+      if (plainText.trim() === shellWithoutMarker.trim()) {
+        const gapCaretIndex = normalizeShellPart(prefix).length;
+        currentEditor.commands.setTextSelection(gapCaretIndex + 1);
+      }
+    },
+    onUpdate: ({ editor: currentEditor }) => {
+      onChange(currentEditor.getText());
+    },
+    onBlur: ({ editor: currentEditor }) => {
+      if (currentEditor.getText().trim() === shellWithoutMarker.trim()) {
+        onChange(shellWithMarker);
+      }
+    },
+  });
 
-    const currentText = value || shellWithMarker;
-    const minWidthPx = Math.ceil(measure(shellWithMarker) + horizontalSpace);
-    const desiredWidthPx = Math.ceil(measure(currentText) + horizontalSpace);
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
 
-    setMinInputWidth(minWidthPx);
-    setInputWidth(Math.max(minWidthPx, desiredWidthPx));
-  }, [shellWithMarker, value]);
+    const editorText = editor.getText();
+    if (editorText !== controlledValue) {
+      editor.commands.setContent(`<p>${escapeHtml(controlledValue)}</p>`, { emitUpdate: false });
+    }
+  }, [controlledValue, editor]);
 
   return (
-    <Input
-      ref={inputRef}
-      id={id}
-      value={value}
-      onChange={(event) => {
-        touchedRef.current = true;
-        onChange(event.target.value);
-      }}
-      onFocus={(event) => {
-        const isPristine = !touchedRef.current && value === shellWithMarker;
-        const shouldRemoveMarker = value === shellWithMarker || value === shellWithoutMarker;
-
-        if (isPristine || shouldRemoveMarker) {
-          onChange(shellWithoutMarker);
-        }
-
-        focusGap({ input: event.currentTarget, prefix: normalizedPrefix, suffix: normalizedSuffix });
-      }}
-      onBlur={() => {
-        const trimmed = value.trim();
-        const hasOnlyShellWithoutGap = trimmed === shellWithoutMarker.trim();
-
-        if (hasOnlyShellWithoutGap) {
-          onChange(shellWithMarker);
-        }
-      }}
+    <div
       className={cn(
-        " h-11 max-w-full rounded-lg border-none bg-background px-2 py-1 h-8 text-md text-foreground/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]",
+        "h-auto min-h-8 w-full max-w-full rounded-lg border-none bg-background text-md shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]",
         className,
       )}
-      style={{
-        width: inputWidth ? `${inputWidth}px` : undefined,
-        minWidth: minInputWidth ? `${minInputWidth}px` : undefined,
-        maxWidth: "100%",
-      }}
-      spellCheck={false}
-      autoComplete="off"
-    />
+    >
+      <EditorContent editor={editor} />
+    </div>
   );
 }
