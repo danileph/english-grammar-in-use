@@ -285,7 +285,7 @@ export function SentenceGapInput({
         spellcheck: "false",
         autocomplete: "off",
         class:
-          "h-auto min-h-8 w-full rounded-lg border-none bg-background px-2 py-1 text-md text-foreground/90 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] whitespace-pre-wrap break-words",
+          "h-auto min-h-8 w-full rounded-lg border-none bg-transparent px-2 py-1 text-md text-foreground/90 outline-none whitespace-pre-wrap break-words",
       },
     },
     onFocus: ({ editor: currentEditor }) => {
@@ -350,7 +350,7 @@ export function SentenceGapInput({
   return (
     <div
       className={cn(
-        "h-auto min-h-8 w-full max-w-full rounded-lg border-none bg-background text-md shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]",
+        "h-auto min-h-8 w-full max-w-full rounded-lg border-none bg-transparent text-md transition-all hover:shadow-[0_0_0_2px_rgba(34,197,94,0.2)] focus-within:shadow-[0_0_0_2px_rgba(34,197,94,0.32)]",
         className,
       )}
     >
