@@ -10,6 +10,7 @@ type UnitMetaBarProps = {
   primaryActionHref: string;
   primaryActionLabel: string;
   primaryActionIcon?: "back";
+  onPrimaryActionClick?: () => void;
   className?: string;
 };
 
@@ -19,6 +20,7 @@ export function UnitMetaBar({
   primaryActionHref,
   primaryActionLabel,
   primaryActionIcon,
+  onPrimaryActionClick,
   className,
 }: UnitMetaBarProps) {
   return (
@@ -38,12 +40,19 @@ export function UnitMetaBar({
       </div>
 
       <div className="ml-auto flex w-full items-center justify-end gap-2 sm:w-auto">
-        <Button asChild className="rounded-xl px-6">
-          <Link href={primaryActionHref} className="inline-flex items-center gap-2">
+        {onPrimaryActionClick ? (
+          <Button className="rounded-xl px-6" onClick={onPrimaryActionClick}>
             {primaryActionIcon === "back" ? <ArrowLeft className="h-4 w-4" aria-hidden="true" /> : null}
             <span>{primaryActionLabel}</span>
-          </Link>
-        </Button>
+          </Button>
+        ) : (
+          <Button asChild className="rounded-xl px-6">
+            <Link href={primaryActionHref} className="inline-flex items-center gap-2">
+              {primaryActionIcon === "back" ? <ArrowLeft className="h-4 w-4" aria-hidden="true" /> : null}
+              <span>{primaryActionLabel}</span>
+            </Link>
+          </Button>
+        )}
         <Button variant="ghost" className="rounded-xl border px-4 text-foreground">
           <Bookmark className="h-4 w-4" aria-hidden="true" />
           Bookmark

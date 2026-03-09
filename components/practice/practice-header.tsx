@@ -7,6 +7,7 @@ type PracticeHeaderProps = {
   primaryActionHref: string;
   primaryActionLabel: string;
   primaryActionIcon?: "back";
+  onPrimaryActionClick?: () => void;
 };
 
 export function PracticeHeader({
@@ -16,6 +17,7 @@ export function PracticeHeader({
   primaryActionHref,
   primaryActionLabel,
   primaryActionIcon,
+  onPrimaryActionClick,
 }: PracticeHeaderProps) {
   return (
     <header className="border-b pb-4">
@@ -28,6 +30,7 @@ export function PracticeHeader({
         primaryActionHref={primaryActionHref}
         primaryActionLabel={primaryActionLabel}
         primaryActionIcon={primaryActionIcon}
+        onPrimaryActionClick={onPrimaryActionClick}
       />
     </header>
   );
