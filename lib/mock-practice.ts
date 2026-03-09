@@ -318,6 +318,99 @@ const unit2Exercise21: PracticeExercise = {
   ],
 };
 
+const unit2Exercise22: PracticeExercise = {
+  id: "2.2",
+  instruction:
+    "Complete what each person says about the news they have read or heard using the present tense phrases in C.",
+  practiceSectionLabel: "C",
+  wordBankLabel: "",
+  wordBank: [],
+  items: [
+    {
+      id: "1",
+      label: "1",
+      parts: ["Government gives health service billions\n", " the government's giving ", "."],
+      blanks: [
+        { id: "1-blank-1", placeholder: "................", options: ["I see"] },
+        { id: "1-blank-2", placeholder: "................", options: ["the health service a lot more money"] },
+      ],
+      correctSentences: [
+        "Government gives health service billions\nI see the government's giving the health service a lot more money.",
+      ],
+    },
+    {
+      id: "2",
+      label: "2",
+      parts: ["Vegecorp to sack 1,000 workers.\n", " Vegecorp are going to ", "."],
+      blanks: [
+        { id: "2-blank-1", placeholder: "................", options: ["I understand"] },
+        { id: "2-blank-2", placeholder: "................", options: ["sack 1,000 workers"] },
+      ],
+      correctSentences: [
+        "Vegecorp to sack 1,000 workers.\nI understand Vegecorp are going to sack 1,000 workers.",
+        "Vegecorp to sack 1,000 workers.\nI hear Vegecorp are going to sack 1,000 workers.",
+      ],
+    },
+    {
+      id: "3",
+      label: "3",
+      parts: [
+        "President Bergman announced a new public holiday on his birthday, August 6th. He made the announcement ...\n",
+        " we're going to have ",
+        ".",
+      ],
+      blanks: [
+        { id: "3-blank-1", placeholder: "................", options: ["I understand"] },
+        { id: "3-blank-2", placeholder: "................", options: ["a new public holiday on August 6th"] },
+      ],
+      correctSentences: [
+        "President Bergman announced a new public holiday on his birthday, August 6th. He made the announcement ...\nI understand we're going to have a new public holiday on August 6th.",
+        "President Bergman announced a new public holiday on his birthday, August 6th. He made the announcement ...\nI hear we're going to have a new public holiday on August 6th.",
+      ],
+    },
+    {
+      id: "4",
+      label: "4",
+      parts: ['Ed: "Did you hear that Bruno\'s crashed his car again?"\n', " Bruno's ", "."],
+      blanks: [
+        { id: "4-blank-1", placeholder: "................", options: ["Ed says"] },
+        { id: "4-blank-2", placeholder: "................", options: ["crashed his car again"] },
+      ],
+      correctSentences: ['Ed: "Did you hear that Bruno\'s crashed his car again?"\nEd says Bruno\'s crashed his car again.'],
+    },
+    {
+      id: "5",
+      label: "5",
+      parts: ['Julia: "I\'ve got a new job."\n', " she's ", "."],
+      blanks: [
+        { id: "5-blank-1", placeholder: "................", options: ["Julia tells me"] },
+        { id: "5-blank-2", placeholder: "................", options: ["got a new job"] },
+      ],
+      correctSentences: ['Julia: "I\'ve got a new job."\nJulia tells me she\'s got a new job.'],
+    },
+    {
+      id: "6",
+      label: "6",
+      parts: [
+        "A team of researchers claims to have identified a gene which causes some people to sleep more than others.\n",
+        " they've identified ",
+        ".",
+      ],
+      blanks: [
+        { id: "6-blank-1", placeholder: "................", options: ["They say"] },
+        {
+          id: "6-blank-2",
+          placeholder: "................",
+          options: ["a gene which causes some people to sleep more than others"],
+        },
+      ],
+      correctSentences: [
+        "A team of researchers claims to have identified a gene which causes some people to sleep more than others.\nThey say they've identified a gene which causes some people to sleep more than others.",
+      ],
+    },
+  ],
+};
+
 const unit1Practice: PracticeMockData = {
   contextLine: "Advanced Grammar in Use · Unit 1",
   pageTitle: "Unit 1: Practice",
@@ -337,11 +430,14 @@ const unit2Practice: PracticeMockData = {
   contextLine: "Advanced Grammar in Use · Unit 2",
   pageTitle: "Unit 2: Practice",
   lessonTitleLineOne: "Using present continuous and present simple",
-  lessonTitleLineTwo: "Exercise 2.1",
-  steps: [{ id: "2.1", label: "2.1 Complete these sentences", status: "current" }],
-  exercises: [unit2Exercise21],
+  lessonTitleLineTwo: "Exercises 2.1-2.2",
+  steps: [
+    { id: "2.1", label: "2.1 Complete these sentences", status: "current" },
+    { id: "2.2", label: "2.2 Complete what each person says about the news", status: "upcoming" },
+  ],
+  exercises: [unit2Exercise21, unit2Exercise22],
   completedExercises: 0,
-  totalExercises: 1,
+  totalExercises: 2,
   currentExerciseNumber: 1,
 };
 
