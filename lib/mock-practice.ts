@@ -254,6 +254,70 @@ const unit1Exercise12: PracticeExercise = {
   ],
 };
 
+const unit2Exercise21: PracticeExercise = {
+  id: "2.1",
+  instruction: "Complete these sentences using the verbs in brackets. Use the present simple or present continuous.",
+  practiceSectionLabel: "A & B",
+  wordBankLabel: "",
+  wordBank: [],
+  items: [
+    {
+      id: "1",
+      label: "1",
+      parts: [
+        "Rodriguez ",
+        " to De Mello, who ",
+        " just over the bar. The home team ",
+        " much more in this half. (pass - shoot - attack)",
+      ],
+      blanks: [
+        { id: "1-blank-1", placeholder: "................", options: ["passes"] },
+        { id: "1-blank-2", placeholder: "................", options: ["shoots"] },
+        { id: "1-blank-3", placeholder: "................", options: ["are attacking"] },
+      ],
+      correctSentences: [
+        "Rodriguez passes to De Mello, who shoots just over the bar. The home team are attacking much more in this half. (pass - shoot - attack)",
+      ],
+    },
+    {
+      id: "2",
+      label: "2",
+      parts: [
+        "A man ",
+        " home late one night after the office Christmas party. His wife ",
+        " for him, and she ",
+        " to him ... (arrive - wait - say)",
+      ],
+      blanks: [
+        { id: "2-blank-1", placeholder: "................", options: ["arrives"] },
+        { id: "2-blank-2", placeholder: "................", options: ["is waiting"] },
+        { id: "2-blank-3", placeholder: "................", options: ["says"] },
+      ],
+      correctSentences: [
+        "A man arrives home late one night after the office Christmas party. His wife is waiting for him, and she says to him ... (arrive - wait - say)",
+      ],
+    },
+    {
+      id: "3",
+      label: "3",
+      parts: [
+        "I went to a concert yesterday in the Town Hall. In the middle of it, while the orchestra ",
+        " this man suddenly ",
+        " on his seat and ",
+        " to conduct them. (play - stand - start)",
+      ],
+      blanks: [
+        { id: "3-blank-1", placeholder: "................", options: ["is playing"] },
+        { id: "3-blank-2", placeholder: "................", options: ["stands"] },
+        { id: "3-blank-3", placeholder: "................", options: ["starts"] },
+      ],
+      correctSentences: [
+        "I went to a concert yesterday in the Town Hall. In the middle of it, while the orchestra is playing this man suddenly stands on his seat and starts to conduct them. (play - stand - start)",
+      ],
+    },
+  ],
+};
+
 const unit1Practice: PracticeMockData = {
   contextLine: "Advanced Grammar in Use · Unit 1",
   pageTitle: "Unit 1: Practice",
@@ -269,9 +333,25 @@ const unit1Practice: PracticeMockData = {
   currentExerciseNumber: 1,
 };
 
+const unit2Practice: PracticeMockData = {
+  contextLine: "Advanced Grammar in Use · Unit 2",
+  pageTitle: "Unit 2: Practice",
+  lessonTitleLineOne: "Using present continuous and present simple",
+  lessonTitleLineTwo: "Exercise 2.1",
+  steps: [{ id: "2.1", label: "2.1 Complete these sentences", status: "current" }],
+  exercises: [unit2Exercise21],
+  completedExercises: 0,
+  totalExercises: 1,
+  currentExerciseNumber: 1,
+};
+
 export function getPracticeMockData(unitOrder: number): PracticeMockData {
   if (unitOrder === 1) {
     return unit1Practice;
+  }
+
+  if (unitOrder === 2) {
+    return unit2Practice;
   }
 
   return unit1Practice;
