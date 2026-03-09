@@ -10,7 +10,6 @@ import { ExerciseProgressSidebar } from "@/components/practice/exercise-progress
 import { LeavePracticeDialog } from "@/components/practice/leave-practice-dialog";
 import { PracticeBottomBar } from "@/components/practice/practice-bottom-bar";
 import { PracticeHeader } from "@/components/practice/practice-header";
-import { Button } from "@/components/ui/button";
 
 type PracticePageLayoutProps = {
   unitId: string;
@@ -331,12 +330,11 @@ export function PracticePageLayout({
               setPendingNavigation({ type: "href", href: new URL(primaryActionHref, window.location.href).href });
               setIsLeaveDialogOpen(true);
             }}
+            secondaryActionLabel={isResetting ? "Restarting..." : "Restart Exersice"}
+            secondaryActionIcon="restart"
+            onSecondaryActionClick={handleRestartExercise}
+            secondaryActionDisabled={isResetting}
           />
-          <div className="flex justify-end">
-            <Button variant="outline" className="rounded-xl px-4" onClick={handleRestartExercise} disabled={isResetting}>
-              {isResetting ? "Restarting..." : "Restart Exercise"}
-            </Button>
-          </div>
 
           {activeExercise ? (
             <ExerciseCard

@@ -8,6 +8,10 @@ type PracticeHeaderProps = {
   primaryActionLabel: string;
   primaryActionIcon?: "back";
   onPrimaryActionClick?: () => void;
+  secondaryActionLabel?: string;
+  secondaryActionIcon?: "bookmark" | "restart";
+  onSecondaryActionClick?: () => void;
+  secondaryActionDisabled?: boolean;
 };
 
 export function PracticeHeader({
@@ -18,6 +22,10 @@ export function PracticeHeader({
   primaryActionLabel,
   primaryActionIcon,
   onPrimaryActionClick,
+  secondaryActionLabel,
+  secondaryActionIcon,
+  onSecondaryActionClick,
+  secondaryActionDisabled,
 }: PracticeHeaderProps) {
   return (
     <header className="border-b pb-4">
@@ -26,11 +34,14 @@ export function PracticeHeader({
       <UnitMetaBar
         className="mt-4"
         estimatedMinutes={estimatedMinutes}
-        learnersLabel="6k learners"
         primaryActionHref={primaryActionHref}
         primaryActionLabel={primaryActionLabel}
         primaryActionIcon={primaryActionIcon}
         onPrimaryActionClick={onPrimaryActionClick}
+        secondaryActionLabel={secondaryActionLabel}
+        secondaryActionIcon={secondaryActionIcon}
+        onSecondaryActionClick={onSecondaryActionClick}
+        secondaryActionDisabled={secondaryActionDisabled}
       />
     </header>
   );
