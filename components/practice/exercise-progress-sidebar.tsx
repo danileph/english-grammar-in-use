@@ -9,9 +9,11 @@ type ExerciseProgressSidebarProps = {
   completed: number;
   total: number;
   steps: PracticeExerciseStep[];
+  activeStepId?: string;
+  onStepSelect?: (stepId: string) => void;
 };
 
-export function ExerciseProgressSidebar({ completed, total, steps }: ExerciseProgressSidebarProps) {
+export function ExerciseProgressSidebar({ completed, total, steps, activeStepId, onStepSelect }: ExerciseProgressSidebarProps) {
   const progressValue = total > 0 ? (completed / total) * 100 : 0;
 
   return (
@@ -26,7 +28,7 @@ export function ExerciseProgressSidebar({ completed, total, steps }: ExercisePro
 
       <ol className="space-y-1 p-3">
         {steps.map((step) => {
-          const isCurrent = step.status === "current";
+          const isCurrent = activeStepId ? step.id === activeStepId : step.status === "current";
           const isCompleted = step.status === "completed";
 
           return (
@@ -37,10 +39,16 @@ export function ExerciseProgressSidebar({ completed, total, steps }: ExercisePro
                 isCurrent ? "bg-secondary/70 ring-1 ring-primary/30" : "hover:bg-muted/50",
               )}
             >
-              <span className="mt-1 text-primary">
-                {isCompleted ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
-              </span>
-              <span className={cn("leading-snug text-foreground/90", isCurrent && "font-semibold")}>{step.label}</span>
+              <button
+                type="button"
+                className="flex w-full items-start gap-3 text-left"
+                onClick={() => onStepSelect?.(step.id)}
+              >
+                <span className="mt-1 text-primary">
+                  {isCompleted ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
+                </span>
+                <span className={cn("leading-snug text-foreground/90", isCurrent && "font-semibold")}>{step.label}</span>
+              </button>
             </li>
           );
         })}

@@ -68,6 +68,10 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+function textToEditorHtml(value: string) {
+  return `<p>${escapeHtml(value).replace(/\n/g, "<br />")}</p>`;
+}
+
 type Segment = { type: "locked" | "editable"; text: string };
 
 function isSentenceDelimiter(char: string) {
@@ -308,10 +312,9 @@ export function SentenceGapInput({
         orderedList: false,
         listItem: false,
         horizontalRule: false,
-        hardBreak: false,
       }),
     ],
-    content: `<p>${escapeHtml(controlledValue)}</p>`,
+    content: textToEditorHtml(controlledValue),
     editorProps: {
       attributes: {
         id,
@@ -322,7 +325,7 @@ export function SentenceGapInput({
       },
     },
     onFocus: ({ editor: currentEditor }) => {
-      const plainText = currentEditor.getText();
+      const plainText = currentEditor.getText({ blockSeparator: "\n" });
       const gapStartIndex = plainText.indexOf(firstMarker);
 
       if (gapStartIndex >= 0) {
@@ -339,18 +342,18 @@ export function SentenceGapInput({
       }
     },
     onUpdate: ({ editor: currentEditor }) => {
-      const currentText = currentEditor.getText();
+      const currentText = currentEditor.getText({ blockSeparator: "\n" });
       const editableChunks = extractEditableChunksFromText(currentText, segments);
 
       if (!editableChunks) {
-        currentEditor.commands.setContent(`<p>${escapeHtml(lastEmittedValueRef.current)}</p>`, { emitUpdate: false });
+        currentEditor.commands.setContent(textToEditorHtml(lastEmittedValueRef.current), { emitUpdate: false });
         return;
       }
 
       const nextValue = rebuildTextFromChunks(segments, editableChunks);
 
       if (nextValue !== currentText) {
-        currentEditor.commands.setContent(`<p>${escapeHtml(nextValue)}</p>`, { emitUpdate: false });
+        currentEditor.commands.setContent(textToEditorHtml(nextValue), { emitUpdate: false });
       }
 
       lastEmittedValueRef.current = nextValue;
@@ -359,7 +362,7 @@ export function SentenceGapInput({
       }
     },
     onBlur: ({ editor: currentEditor }) => {
-      if (currentEditor.getText().trim() === shellWithoutMarker.trim()) {
+      if (currentEditor.getText({ blockSeparator: "\n" }).trim() === shellWithoutMarker.trim()) {
         onChange(shellWithMarker);
       }
     },
@@ -374,9 +377,9 @@ export function SentenceGapInput({
       return;
     }
 
-    const editorText = editor.getText();
+    const editorText = editor.getText({ blockSeparator: "\n" });
     if (editorText !== controlledValue) {
-      editor.commands.setContent(`<p>${escapeHtml(controlledValue)}</p>`, { emitUpdate: false });
+      editor.commands.setContent(textToEditorHtml(controlledValue), { emitUpdate: false });
     }
   }, [controlledValue, editor]);
 

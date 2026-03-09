@@ -11,6 +11,21 @@ export type PracticeExerciseItem = {
   parts: string[];
   blanks: PracticeBlank[];
   correctSentences?: string[];
+  mistakeReviewHtml?: string;
+  choiceChecks?: Array<{
+    id: string;
+    options: [string, string];
+    acceptedOptionIndexes: number[];
+  }>;
+};
+
+export type PracticeExercise = {
+  id: string;
+  instruction: string;
+  practiceSectionLabel?: string;
+  wordBankLabel: string;
+  wordBank: string[];
+  items: PracticeExerciseItem[];
 };
 
 export type PracticeExerciseStep = {
@@ -24,36 +39,25 @@ export type PracticeMockData = {
   pageTitle: string;
   lessonTitleLineOne: string;
   lessonTitleLineTwo: string;
-  instruction: string;
-  practiceSectionLabel?: string;
-  wordBankLabel: string;
-  wordBank: string[];
-  exerciseItems: PracticeExerciseItem[];
   steps: PracticeExerciseStep[];
+  exercises: PracticeExercise[];
   completedExercises: number;
   totalExercises: number;
   currentExerciseNumber: number;
 };
 
-const unit1Exercise11: PracticeMockData = {
-  contextLine: "Advanced Grammar in Use · Unit 1 · Exercise 1.1",
-  pageTitle: "Unit 1: Exercise 1.1",
-  lessonTitleLineOne: "State verbs and the present continuous",
-  lessonTitleLineTwo: "Exercise 1.1",
+const unit1Exercise11: PracticeExercise = {
+  id: "1.1",
   instruction:
     "Complete each pair of sentences using the same verb (in a question form or negative if necessary) from the box. Use the present continuous; if this is not possible, use the present simple. You may use any words outside the gap and contracted forms where appropriate.",
   practiceSectionLabel: "A & B",
   wordBankLabel: "A & B",
   wordBank: ["attract", "consist of", "doubt", "feel", "fit", "have", "like", "look", "measure", "sound"],
-  completedExercises: 0,
-  totalExercises: 1,
-  currentExerciseNumber: 1,
-  steps: [{ id: "1.1", label: "1.1 Complete each pair of sentences", status: "current" }],
-  exerciseItems: [
+  items: [
     {
       id: "1a",
       label: "1a",
-      parts: ["I hear you're having your house repainted. How ^ it ", " ? (or How ^ it ", " ?)"],
+      parts: ["I hear you're having your house repainted. How ^ it ", " ? (or How ^ it ", " ?)",],
       blanks: [
         { id: "1a-blank-1", placeholder: "................", options: ["look"] },
         { id: "1a-blank-2", placeholder: "................", options: ["look"] },
@@ -207,10 +211,68 @@ const unit1Exercise11: PracticeMockData = {
   ],
 };
 
+const unit1Exercise12: PracticeExercise = {
+  id: "1.2",
+  instruction: "Cross out any improbable answers.",
+  practiceSectionLabel: "C & D",
+  wordBankLabel: "",
+  wordBank: [],
+  items: [
+    {
+      id: "letter",
+      label: "",
+      parts: [""],
+      blanks: [
+        {
+          id: "letter-blank-1",
+          placeholder:
+            "Dear Aunt Mara,\n\nThanks for your message. I (1) apologise / I'm apologising for not getting back to you sooner, but I've been incredibly busy. When I went into nursing, you warned me that it would be really hard work, but I (2) admit / I'm admitting that I didn't really believe you. Don't get me wrong - I (3) don't suggest / I'm not suggesting that I'm not enjoying it. It's incredibly rewarding, but I (4) now realise / I'm now realising how hard the job is. When I get home I just eat (not very well, I (5) confess / I'm confessing) and go straight to bed. It doesn't help that the bus journey to the hospital is so slow. I (6) consider / I'm considering buying a car, which will make things easier, I hope.\n\nAnd what about you? How (7) do you find / are you finding living in a village after so many years in the city? I (8) know / I'm knowing how difficult it is for you to travel such a long way, but it would be lovely if you could come and stay with me for a weekend. I've got plenty of room in my flat. I (9) don't guarantee / I'm not guaranteeing to cook as well as you do, but I (10) promise / I'm promising to find time to show you around this lovely old town.\n\nHope to see you soon. Keep in touch.\n\nLove,\n\nMartina",
+          options: [],
+        },
+      ],
+      correctSentences: [
+        "Dear Aunt Mara,\n\nThanks for your message. I (1) apologise for not getting back to you sooner, but I've been incredibly busy. When I went into nursing, you warned me that it would be really hard work, but I (2) admit that I didn't really believe you. Don't get me wrong - I (3) I'm not suggesting that I'm not enjoying it. It's incredibly rewarding, but I (4) now realise how hard the job is. When I get home I just eat (not very well, I (5) confess) and go straight to bed. It doesn't help that the bus journey to the hospital is so slow. I (6) I'm considering buying a car, which will make things easier, I hope.\n\nAnd what about you? How (7) are you finding living in a village after so many years in the city? I (8) know how difficult it is for you to travel such a long way, but it would be lovely if you could come and stay with me for a weekend. I've got plenty of room in my flat. I (9) don't guarantee to cook as well as you do, but I (10) promise to find time to show you around this lovely old town.\n\nHope to see you soon. Keep in touch.\n\nLove,\n\nMartina",
+        "Dear Aunt Mara,\n\nThanks for your message. I (1) apologise for not getting back to you sooner, but I've been incredibly busy. When I went into nursing, you warned me that it would be really hard work, but I (2) admit that I didn't really believe you. Don't get me wrong - I (3) don't suggest that I'm not enjoying it. It's incredibly rewarding, but I (4) now realise how hard the job is. When I get home I just eat (not very well, I (5) confess) and go straight to bed. It doesn't help that the bus journey to the hospital is so slow. I (6) I'm considering buying a car, which will make things easier, I hope.\n\nAnd what about you? How (7) are you finding living in a village after so many years in the city? I (8) know how difficult it is for you to travel such a long way, but it would be lovely if you could come and stay with me for a weekend. I've got plenty of room in my flat. I (9) don't guarantee to cook as well as you do, but I (10) promise to find time to show you around this lovely old town.\n\nHope to see you soon. Keep in touch.\n\nLove,\n\nMartina",
+        "Dear Aunt Mara,\n\nThanks for your message. I (1) apologise for not getting back to you sooner, but I've been incredibly busy. When I went into nursing, you warned me that it would be really hard work, but I (2) admit that I didn't really believe you. Don't get me wrong - I (3) I'm not suggesting that I'm not enjoying it. It's incredibly rewarding, but I (4) now realise how hard the job is. When I get home I just eat (not very well, I (5) confess) and go straight to bed. It doesn't help that the bus journey to the hospital is so slow. I (6) I'm considering buying a car, which will make things easier, I hope.\n\nAnd what about you? How (7) do you find living in a village after so many years in the city? I (8) know how difficult it is for you to travel such a long way, but it would be lovely if you could come and stay with me for a weekend. I've got plenty of room in my flat. I (9) don't guarantee to cook as well as you do, but I (10) promise to find time to show you around this lovely old town.\n\nHope to see you soon. Keep in touch.\n\nLove,\n\nMartina",
+        "Dear Aunt Mara,\n\nThanks for your message. I (1) apologise for not getting back to you sooner, but I've been incredibly busy. When I went into nursing, you warned me that it would be really hard work, but I (2) admit that I didn't really believe you. Don't get me wrong - I (3) don't suggest that I'm not enjoying it. It's incredibly rewarding, but I (4) now realise how hard the job is. When I get home I just eat (not very well, I (5) confess) and go straight to bed. It doesn't help that the bus journey to the hospital is so slow. I (6) I'm considering buying a car, which will make things easier, I hope.\n\nAnd what about you? How (7) do you find living in a village after so many years in the city? I (8) know how difficult it is for you to travel such a long way, but it would be lovely if you could come and stay with me for a weekend. I've got plenty of room in my flat. I (9) don't guarantee to cook as well as you do, but I (10) promise to find time to show you around this lovely old town.\n\nHope to see you soon. Keep in touch.\n\nLove,\n\nMartina",
+      ],
+      mistakeReviewHtml:
+        "Dear Aunt Mara,<br /><br />Thanks for your message. I (1) apologise / <strong><del>I'm apologising</del></strong> for not getting back to you sooner, but I've been incredibly busy. When I went into nursing, you warned me that it would be really hard work, but I (2) admit / <strong><del>I'm admitting</del></strong> that I didn't really believe you. Don't get me wrong - I (3) don't suggest / I'm not suggesting that I'm not enjoying it. It's incredibly rewarding, but I (4) now realise / <strong><del>I'm now realising</del></strong> how hard the job is. When I get home I just eat (not very well, I (5) confess / <strong><del>I'm confessing</del></strong>) and go straight to bed. It doesn't help that the bus journey to the hospital is so slow. I (6) <strong><del>consider</del></strong> / I'm considering buying a car, which will make things easier, I hope.<br /><br />And what about you? How (7) do you find / are you finding living in a village after so many years in the city? I (8) know / <strong><del>I'm knowing</del></strong> how difficult it is for you to travel such a long way, but it would be lovely if you could come and stay with me for a weekend. I've got plenty of room in my flat. I (9) don't guarantee / <strong><del>I'm not guaranteeing</del></strong> to cook as well as you do, but I (10) promise / <strong><del>I'm promising</del></strong> to find time to show you around this lovely old town.<br /><br />Hope to see you soon. Keep in touch.<br /><br />Love,<br /><br />Martina",
+      choiceChecks: [
+        { id: "1", options: ["apologise", "I'm apologising"], acceptedOptionIndexes: [0] },
+        { id: "2", options: ["admit", "I'm admitting"], acceptedOptionIndexes: [0] },
+        { id: "3", options: ["don't suggest", "I'm not suggesting"], acceptedOptionIndexes: [0, 1] },
+        { id: "4", options: ["now realise", "I'm now realising"], acceptedOptionIndexes: [0] },
+        { id: "5", options: ["confess", "I'm confessing"], acceptedOptionIndexes: [0] },
+        { id: "6", options: ["consider", "I'm considering"], acceptedOptionIndexes: [1] },
+        { id: "7", options: ["do you find", "are you finding"], acceptedOptionIndexes: [0, 1] },
+        { id: "8", options: ["know", "I'm knowing"], acceptedOptionIndexes: [0] },
+        { id: "9", options: ["don't guarantee", "I'm not guaranteeing"], acceptedOptionIndexes: [0] },
+        { id: "10", options: ["promise", "I'm promising"], acceptedOptionIndexes: [0] },
+      ],
+    },
+  ],
+};
+
+const unit1Practice: PracticeMockData = {
+  contextLine: "Advanced Grammar in Use · Unit 1",
+  pageTitle: "Unit 1: Practice",
+  lessonTitleLineOne: "State verbs and the present continuous",
+  lessonTitleLineTwo: "Exercises 1.1-1.2",
+  steps: [
+    { id: "1.1", label: "1.1 Complete each pair of sentences", status: "current" },
+    { id: "1.2", label: "1.2 Cross out any improbable answers", status: "upcoming" },
+  ],
+  exercises: [unit1Exercise11, unit1Exercise12],
+  completedExercises: 0,
+  totalExercises: 2,
+  currentExerciseNumber: 1,
+};
+
 export function getPracticeMockData(unitOrder: number): PracticeMockData {
   if (unitOrder === 1) {
-    return unit1Exercise11;
+    return unit1Practice;
   }
 
-  return unit1Exercise11;
+  return unit1Practice;
 }

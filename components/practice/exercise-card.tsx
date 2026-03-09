@@ -10,7 +10,7 @@ import { useWordBankUsage } from "@/components/practice/hooks/use-word-bank-usag
 import { WordBank } from "@/components/practice/word-bank";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { checkExerciseAnswers, matchesAnswerOption } from "@/lib/practice-answer-check";
+import { checkExerciseAnswers, evaluateChoiceChecks, matchesAnswerOption } from "@/lib/practice-answer-check";
 
 type ExerciseCardProps = {
   exerciseId?: string;
@@ -162,23 +162,43 @@ export function ExerciseCard({
 
   const usedWords = useWordBankUsage(words, answerTexts);
   const requiredWordCount = useMemo(() => new Set(words.map((word) => word.toLowerCase())).size, [words]);
-  const allWordsUsed = requiredWordCount > 0 && usedWords.size >= requiredWordCount;
   const exerciseProgress = useMemo(() => {
-    const totalElements = items.length;
-    const completedElements = items.reduce((completed, item) => {
-      const isCompleted = item.blanks.some((blank) => {
-        const answer = answersByBlankId[blank.id] ?? "";
-        return words.some((word) => matchesAnswerOption(answer, word));
-      });
-      return completed + (isCompleted ? 1 : 0);
-    }, 0);
+    let totalElements = 0;
+    let completedElements = 0;
+
+    for (const item of items) {
+      if (item.choiceChecks && item.choiceChecks.length > 0) {
+        const points = evaluateChoiceChecks(answersByItemId[item.id] ?? "", item.choiceChecks);
+        totalElements += points.totalPoints;
+        completedElements += points.answeredPoints > 0 ? points.totalPoints : 0;
+        continue;
+      }
+
+      totalElements += 1;
+      const isCompleted =
+        words.length > 0
+          ? item.blanks.some((blank) => {
+              const answer = answersByBlankId[blank.id] ?? "";
+              return words.some((word) => matchesAnswerOption(answer, word));
+            })
+          : item.blanks.every((blank) => {
+              const answer = answersByBlankId[blank.id] ?? "";
+              const marker = blank.placeholder || "..........";
+              return answer.trim().length > 0 && answer.trim() !== marker.trim();
+            });
+      if (isCompleted) {
+        completedElements += 1;
+      }
+    }
 
     return { completedElements, totalElements };
-  }, [answersByBlankId, items, words]);
+  }, [answersByBlankId, answersByItemId, items, words]);
+  const allWordsUsed = requiredWordCount > 0 && usedWords.size >= requiredWordCount;
+  const canCheckAnswers = requiredWordCount > 0 ? allWordsUsed : exerciseProgress.completedElements > 0;
 
   useEffect(() => {
-    onWordBankUsageChange?.(allWordsUsed);
-  }, [allWordsUsed, onWordBankUsageChange]);
+    onWordBankUsageChange?.(canCheckAnswers);
+  }, [canCheckAnswers, onWordBankUsageChange]);
 
   useEffect(() => {
     onExerciseProgressChange?.(exerciseProgress);
@@ -231,9 +251,11 @@ export function ExerciseCard({
         </p>
       </div>
 
-      <div className="mt-5">
-        <WordBank label={wordBankLabel} words={words} usedWords={usedWords} />
-      </div>
+      {words.length > 0 ? (
+        <div className="mt-5">
+          <WordBank label={wordBankLabel} words={words} usedWords={usedWords} />
+        </div>
+      ) : null}
 
       <div className="mt-5 space-y-4 pr-1">
         {groupedItems.map((group) => {

@@ -59,3 +59,64 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ accuracy, isCompleted });
 }
+
+export async function DELETE(request: Request) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const json = (await request.json()) as unknown;
+  const unitId = typeof json === "object" && json !== null && "unitId" in json ? (json as { unitId?: unknown }).unitId : null;
+  const exerciseId =
+    typeof json === "object" && json !== null && "exerciseId" in json ? (json as { exerciseId?: unknown }).exerciseId : null;
+
+  if (typeof unitId !== "string" || !unitId.trim()) {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  }
+
+  await db.exerciseAttempt.deleteMany({
+    where: {
+      userId: session.user.id,
+      unitId,
+      ...(typeof exerciseId === "string" && exerciseId.trim() ? { exerciseId } : {}),
+    },
+  });
+
+  const remainingAttempts = await db.exerciseAttempt.findMany({
+    where: {
+      userId: session.user.id,
+      unitId,
+    },
+    select: {
+      accuracy: true,
+    },
+  });
+
+  const hasAttempts = remainingAttempts.length > 0;
+  const averageAccuracy = hasAttempts
+    ? Math.round(remainingAttempts.reduce((sum, attempt) => sum + attempt.accuracy, 0) / remainingAttempts.length)
+    : null;
+
+  await db.progress.upsert({
+    where: {
+      userId_unitId: {
+        userId: session.user.id,
+        unitId,
+      },
+    },
+    update: {
+      status: hasAttempts ? "IN_PROGRESS" : "NOT_STARTED",
+      accuracy: averageAccuracy,
+    },
+    create: {
+      userId: session.user.id,
+      unitId,
+      status: hasAttempts ? "IN_PROGRESS" : "NOT_STARTED",
+      accuracy: averageAccuracy,
+    },
+  });
+
+  return NextResponse.json({ ok: true });
+}

@@ -22,10 +22,11 @@ export function ExerciseItem({
   const gapMarkers = item.blanks.map((blank) => blank.placeholder || "..........");
   const mistake = mistakesByItemId?.[item.id];
   const hasMistakes = showMistakes && Boolean(mistake);
+  const hasItemLabel = item.label.trim().length > 0;
 
   return (
     <div className="flex items-start gap-3">
-      {!hideItemLabel ? (
+      {!hideItemLabel && hasItemLabel ? (
         <span className="mt-0.5 inline-flex min-h-6 min-w-6 items-center justify-center rounded-md border px-2 text-xs ">
           {item.label}
         </span>
@@ -43,7 +44,16 @@ export function ExerciseItem({
         </div>
         {hasMistakes ? (
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
-            <strong>Correct:</strong> {(mistake?.expectedSentences ?? []).join(" / ")}
+            {item.mistakeReviewHtml ? (
+              <div className="space-y-1">
+                <strong>Review:</strong>
+                <div className="whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: item.mistakeReviewHtml }} />
+              </div>
+            ) : (
+              <>
+                <strong>Correct:</strong> {(mistake?.expectedSentences ?? []).join(" / ")}
+              </>
+            )}
           </div>
         ) : null}
       </div>
