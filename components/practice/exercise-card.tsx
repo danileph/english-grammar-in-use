@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 
 import type { PracticeExerciseItem } from "@/lib/mock-practice";
 
@@ -9,7 +10,9 @@ import { buildSentenceShell, extractGapValuesFromSentence } from "@/components/p
 import { useWordBankUsage } from "@/components/practice/hooks/use-word-bank-usage";
 import { WordBank } from "@/components/practice/word-bank";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { checkExerciseAnswers } from "@/lib/practice-answer-check";
 
 type ExerciseCardProps = {
   exerciseNumber?: string;
@@ -93,27 +96,52 @@ export function ExerciseCard({
 
     return initial;
   });
+  const [isChecked, setIsChecked] = useState(false);
+
+  const answersByBlankId = useMemo(() => {
+    const nextAnswersByBlankId: Record<string, string> = {};
+
+    for (const itemContext of itemContexts) {
+      const values = extractGapValuesFromSentence({
+        value: answersByItemId[itemContext.itemId] ?? "",
+        parts: itemContext.parts,
+        gapMarkers: itemContext.gapMarkers,
+      });
+
+      itemContext.blankIds.forEach((blankId, index) => {
+        nextAnswersByBlankId[blankId] = values[index] ?? "";
+      });
+    }
+
+    return nextAnswersByBlankId;
+  }, [answersByItemId, itemContexts]);
 
   const answerTexts = useMemo(
-    () => {
-      const answersByBlankId: Record<string, string> = {};
+    () => items.flatMap((item) => item.blanks.map((blank) => answersByBlankId[blank.id] ?? "")),
+    [answersByBlankId, items],
+  );
 
-      for (const itemContext of itemContexts) {
-        const values = extractGapValuesFromSentence({
-          value: answersByItemId[itemContext.itemId] ?? "",
-          parts: itemContext.parts,
-          gapMarkers: itemContext.gapMarkers,
-        });
+  const checkResult = useMemo(
+    () => checkExerciseAnswers(items, answersByBlankId),
+    [answersByBlankId, items],
+  );
 
-        itemContext.blankIds.forEach((blankId, index) => {
-          answersByBlankId[blankId] = values[index] ?? "";
-        });
+  const mistakesByBlankId = useMemo(() => {
+    const mistakes: Record<string, { expectedOptions: string[]; userAnswer: string }> = {};
+    for (const [blankId, result] of Object.entries(checkResult.byBlankId)) {
+      if (result.isCorrect) {
+        continue;
       }
 
-      return items.flatMap((item) => item.blanks.map((blank) => answersByBlankId[blank.id] ?? ""));
-    },
-    [answersByItemId, itemContexts, items],
-  );
+      mistakes[blankId] = {
+        expectedOptions: result.expectedOptions,
+        userAnswer: result.userAnswer,
+      };
+    }
+
+    return mistakes;
+  }, [checkResult.byBlankId]);
+
   const usedWords = useWordBankUsage(words, answerTexts);
 
   const handleItemValueChange = (itemId: string, value: string) => {
@@ -145,6 +173,10 @@ export function ExerciseCard({
             </>
           ) : null}
         </p>
+        <Button onClick={() => setIsChecked(true)} className="rounded-lg" size="sm">
+          <CheckCircle2 className="h-4 w-4" />
+          Check answers
+        </Button>
       </div>
 
       <div className="mt-5">
@@ -162,6 +194,8 @@ export function ExerciseCard({
                 item={single.item}
                 valuesByItemId={answersByItemId}
                 onItemValueChange={handleItemValueChange}
+                showMistakes={isChecked}
+                mistakesByBlankId={mistakesByBlankId}
               />
             );
           }
@@ -183,6 +217,8 @@ export function ExerciseCard({
                         valuesByItemId={answersByItemId}
                         onItemValueChange={handleItemValueChange}
                         hideItemLabel
+                        showMistakes={isChecked}
+                        mistakesByBlankId={mistakesByBlankId}
                       />
                     </div>
                   </div>
@@ -192,6 +228,11 @@ export function ExerciseCard({
           );
         })}
       </div>
+      {isChecked ? (
+        <div className="mt-5 rounded-xl border bg-muted/40 px-3 py-2 text-sm">
+          {checkResult.correctBlanks}/{checkResult.totalBlanks} correct. Mistakes: {checkResult.incorrectBlanks}
+        </div>
+      ) : null}
     </Card>
   );
 }
