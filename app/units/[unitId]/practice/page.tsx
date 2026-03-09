@@ -47,7 +47,9 @@ export default async function UnitPracticePage({
       topic={unit.topic}
       title={unit.title}
       estimatedMinutes={unit.estimatedMinutes}
-      practiceHref={`/units/${unit.order}/practice`}
+      primaryActionHref={`/units/${unit.order}`}
+      primaryActionLabel="Go back"
+      primaryActionIcon="back"
     />
   );
 }

@@ -1,4 +1,4 @@
-import { Bookmark, Clock3 } from "lucide-react";
+import { ArrowLeft, Bookmark, Clock3 } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,20 @@ import { cn } from "@/lib/utils";
 type UnitMetaBarProps = {
   estimatedMinutes: number;
   learnersLabel: string;
-  practiceHref: string;
+  primaryActionHref: string;
+  primaryActionLabel: string;
+  primaryActionIcon?: "back";
   className?: string;
 };
 
-export function UnitMetaBar({ estimatedMinutes, learnersLabel, practiceHref, className }: UnitMetaBarProps) {
+export function UnitMetaBar({
+  estimatedMinutes,
+  learnersLabel,
+  primaryActionHref,
+  primaryActionLabel,
+  primaryActionIcon,
+  className,
+}: UnitMetaBarProps) {
   return (
     <div className={cn("flex flex-wrap items-center gap-x-4 gap-y-3 bg-white/70", className)}>
       <div className="flex min-w-0 flex-wrap items-center gap-3 text-sm text-muted-foreground sm:text-base">
@@ -30,7 +39,10 @@ export function UnitMetaBar({ estimatedMinutes, learnersLabel, practiceHref, cla
 
       <div className="ml-auto flex w-full items-center justify-end gap-2 sm:w-auto">
         <Button asChild className="rounded-xl px-6">
-          <Link href={practiceHref}>Start practice</Link>
+          <Link href={primaryActionHref} className="inline-flex items-center gap-2">
+            {primaryActionIcon === "back" ? <ArrowLeft className="h-4 w-4" aria-hidden="true" /> : null}
+            <span>{primaryActionLabel}</span>
+          </Link>
         </Button>
         <Button variant="ghost" className="rounded-xl border px-4 text-foreground">
           <Bookmark className="h-4 w-4" aria-hidden="true" />

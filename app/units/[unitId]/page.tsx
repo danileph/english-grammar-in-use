@@ -75,7 +75,8 @@ export default async function UnitDetailPage({
             className="mt-4"
             estimatedMinutes={unit.estimatedMinutes}
             learnersLabel="6k learners"
-            practiceHref={`/units/${unit.order}/practice`}
+            primaryActionHref={`/units/${unit.order}/practice`}
+            primaryActionLabel="Start practice"
           />
         </header>
 

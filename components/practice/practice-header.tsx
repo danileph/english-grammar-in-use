@@ -4,14 +4,18 @@ type PracticeHeaderProps = {
   topic: string;
   title: string;
   estimatedMinutes: number;
-  practiceHref: string;
+  primaryActionHref: string;
+  primaryActionLabel: string;
+  primaryActionIcon?: "back";
 };
 
 export function PracticeHeader({
   topic,
   title,
   estimatedMinutes,
-  practiceHref,
+  primaryActionHref,
+  primaryActionLabel,
+  primaryActionIcon,
 }: PracticeHeaderProps) {
   return (
     <header className="border-b pb-4">
@@ -21,7 +25,9 @@ export function PracticeHeader({
         className="mt-4"
         estimatedMinutes={estimatedMinutes}
         learnersLabel="6k learners"
-        practiceHref={practiceHref}
+        primaryActionHref={primaryActionHref}
+        primaryActionLabel={primaryActionLabel}
+        primaryActionIcon={primaryActionIcon}
       />
     </header>
   );

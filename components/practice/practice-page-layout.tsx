@@ -14,7 +14,9 @@ type PracticePageLayoutProps = {
   topic: string;
   title: string;
   estimatedMinutes: number;
-  practiceHref: string;
+  primaryActionHref: string;
+  primaryActionLabel: string;
+  primaryActionIcon?: "back";
 };
 
 export function PracticePageLayout({
@@ -22,7 +24,9 @@ export function PracticePageLayout({
   topic,
   title,
   estimatedMinutes,
-  practiceHref,
+  primaryActionHref,
+  primaryActionLabel,
+  primaryActionIcon,
 }: PracticePageLayoutProps) {
   const [checkAnswersSignal, setCheckAnswersSignal] = useState(0);
 
@@ -33,7 +37,9 @@ export function PracticePageLayout({
           topic={topic}
           title={title}
           estimatedMinutes={estimatedMinutes}
-          practiceHref={practiceHref}
+          primaryActionHref={primaryActionHref}
+          primaryActionLabel={primaryActionLabel}
+          primaryActionIcon={primaryActionIcon}
         />
 
         <ExerciseCard
