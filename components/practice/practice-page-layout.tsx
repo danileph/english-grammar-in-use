@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 import type { PracticeMockData } from "@/lib/mock-practice";
 
 import { ExerciseCard } from "@/components/practice/exercise-card";
@@ -20,6 +24,8 @@ export function PracticePageLayout({
   estimatedMinutes,
   practiceHref,
 }: PracticePageLayoutProps) {
+  const [checkAnswersSignal, setCheckAnswersSignal] = useState(0);
+
   return (
     <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_280px]">
       <div className="space-y-6">
@@ -37,9 +43,14 @@ export function PracticePageLayout({
           wordBankLabel={data.wordBankLabel}
           words={data.wordBank}
           items={data.exerciseItems}
+          checkAnswersSignal={checkAnswersSignal}
         />
 
-        <PracticeBottomBar current={data.currentExerciseNumber} total={data.totalExercises} />
+        <PracticeBottomBar
+          current={data.currentExerciseNumber}
+          total={data.totalExercises}
+          onCheckAnswers={() => setCheckAnswersSignal((current) => current + 1)}
+        />
       </div>
 
       <div className="h-(100%+24px) -my-6 py-2 md:justify-self-end md:border-l md:-mr-6">

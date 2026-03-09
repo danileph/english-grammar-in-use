@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
 
 import type { PracticeExerciseItem } from "@/lib/mock-practice";
 
@@ -10,7 +9,6 @@ import { buildSentenceShell, extractGapValuesFromSentence } from "@/components/p
 import { useWordBankUsage } from "@/components/practice/hooks/use-word-bank-usage";
 import { WordBank } from "@/components/practice/word-bank";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { checkExerciseAnswers } from "@/lib/practice-answer-check";
 
@@ -21,6 +19,7 @@ type ExerciseCardProps = {
   wordBankLabel: string;
   words: string[];
   items: PracticeExerciseItem[];
+  checkAnswersSignal?: number;
 };
 
 type GroupedExerciseItems = {
@@ -49,6 +48,7 @@ export function ExerciseCard({
   wordBankLabel,
   words,
   items,
+  checkAnswersSignal = 0,
 }: ExerciseCardProps) {
   const groupedItems = useMemo<GroupedExerciseItems[]>(() => {
     const groups = new Map<string, GroupedExerciseItems>();
@@ -96,7 +96,7 @@ export function ExerciseCard({
 
     return initial;
   });
-  const [isChecked, setIsChecked] = useState(false);
+  const isChecked = checkAnswersSignal > 0;
 
   const answersByBlankId = useMemo(() => {
     const nextAnswersByBlankId: Record<string, string> = {};
@@ -170,10 +170,6 @@ export function ExerciseCard({
             </>
           ) : null}
         </p>
-        <Button onClick={() => setIsChecked(true)} className="rounded-lg" size="sm">
-          <CheckCircle2 className="h-4 w-4" />
-          Check answers
-        </Button>
       </div>
 
       <div className="mt-5">
