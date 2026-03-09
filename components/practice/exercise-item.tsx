@@ -43,7 +43,7 @@ export function ExerciseItem({
         </div>
         {hasMistakes ? (
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
-            Correct sentence: {(mistake?.expectedSentences ?? []).join(" / ")}
+            <strong>Correct:</strong> {(mistake?.expectedSentences ?? []).join(" / ")}
           </div>
         ) : null}
       </div>
