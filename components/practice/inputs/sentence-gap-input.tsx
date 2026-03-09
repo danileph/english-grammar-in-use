@@ -30,6 +30,40 @@ export function buildSentenceWithoutGap(parts: string[]) {
   return parts.map(normalizeShellPart).join("");
 }
 
+function findPartRange(value: string, rawPart: string, fromIndex: number) {
+  const segments = rawPart
+    .split("^")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+  let cursor = fromIndex;
+  let start = -1;
+  let end = -1;
+
+  for (const segment of segments) {
+    if (!segment) {
+      continue;
+    }
+
+    const segmentIndex = value.indexOf(segment, cursor);
+    if (segmentIndex < 0) {
+      return null;
+    }
+
+    if (start < 0) {
+      start = segmentIndex;
+    }
+
+    end = segmentIndex + segment.length;
+    cursor = end;
+  }
+
+  if (start < 0 || end < 0) {
+    return null;
+  }
+
+  return { start, end };
+}
+
 function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -217,27 +251,26 @@ export function extractGapValuesFromSentence({ value, parts, gapMarkers }: Extra
     return Array.from({ length: blankCount }, () => "");
   }
 
-  const normalizedParts = parts.map(normalizeShellPart);
   const answers: string[] = [];
   let cursor = 0;
 
   for (let index = 0; index < blankCount; index += 1) {
-    const partBefore = normalizedParts[index] ?? "";
-    const partAfter = normalizedParts[index + 1] ?? "";
+    const partBefore = parts[index] ?? "";
+    const partAfter = parts[index + 1] ?? "";
     const marker = gapMarkers[index] ?? "";
 
     if (partBefore) {
-      const beforeIndex = value.indexOf(partBefore, cursor);
-      if (beforeIndex >= 0) {
-        cursor = beforeIndex + partBefore.length;
+      const beforeRange = findPartRange(value, partBefore, cursor);
+      if (beforeRange) {
+        cursor = beforeRange.end;
       }
     }
 
     let nextBoundary = value.length;
     if (partAfter) {
-      const afterIndex = value.indexOf(partAfter, cursor);
-      if (afterIndex >= 0) {
-        nextBoundary = afterIndex;
+      const afterRange = findPartRange(value, partAfter, cursor);
+      if (afterRange) {
+        nextBoundary = afterRange.start;
       }
     }
 
