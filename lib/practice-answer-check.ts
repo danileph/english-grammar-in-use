@@ -90,61 +90,97 @@ export function matchesAnswerOption(answer: string, option: string) {
   return false;
 }
 
-export type BlankCheckResult = {
-  blankId: string;
-  userAnswer: string;
-  expectedOptions: string[];
+function normalizeShellPart(value: string) {
+  return value.replace(/\s*\^\s*/g, " ");
+}
+
+function buildSentenceFromParts(parts: string[], answers: string[]) {
+  return parts.reduce((acc, part, index) => {
+    const nextAnswer = answers[index] ?? "";
+    return `${acc}${normalizeShellPart(part)}${nextAnswer}`;
+  }, "");
+}
+
+function normalizeSentence(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\s*\^\s*/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.;:?!)])/g, "$1")
+    .replace(/([(])\s+/g, "$1")
+    .trim();
+}
+
+export type ItemCheckResult = {
+  itemId: string;
+  userSentence: string;
+  expectedSentences: string[];
   isAnswered: boolean;
   isCorrect: boolean;
 };
 
 export type ExerciseCheckResult = {
-  byBlankId: Record<string, BlankCheckResult>;
-  totalBlanks: number;
-  answeredBlanks: number;
-  correctBlanks: number;
-  incorrectBlanks: number;
+  byItemId: Record<string, ItemCheckResult>;
+  totalItems: number;
+  answeredItems: number;
+  correctItems: number;
+  incorrectItems: number;
 };
 
 export function checkExerciseAnswers(
   items: PracticeExerciseItem[],
-  answersByBlankId: Record<string, string>,
+  answersByItemId: Record<string, string>,
 ): ExerciseCheckResult {
-  const byBlankId: Record<string, BlankCheckResult> = {};
-  let totalBlanks = 0;
-  let answeredBlanks = 0;
-  let correctBlanks = 0;
+  const byItemId: Record<string, ItemCheckResult> = {};
+  let totalItems = 0;
+  let answeredItems = 0;
+  let correctItems = 0;
 
   for (const item of items) {
-    for (const blank of item.blanks) {
-      totalBlanks += 1;
-      const userAnswer = answersByBlankId[blank.id] ?? "";
-      const isAnswered = userAnswer.trim().length > 0;
+    totalItems += 1;
+    const userSentence = answersByItemId[item.id] ?? "";
+    const expectedSentences =
+      item.correctSentences && item.correctSentences.length > 0
+        ? item.correctSentences
+        : [
+            buildSentenceFromParts(
+              item.parts,
+              item.blanks.map((blank) => blank.options[0] ?? ""),
+            ),
+          ];
 
-      if (isAnswered) {
-        answeredBlanks += 1;
-      }
+    const hasUnfilledPlaceholder = item.blanks.some((blank) =>
+      userSentence.includes(blank.placeholder || ".........."),
+    );
+    const isAnswered = userSentence.trim().length > 0 && !hasUnfilledPlaceholder;
 
-      const isCorrect = blank.options.some((option) => matchesAnswerOption(userAnswer, option));
-      if (isCorrect) {
-        correctBlanks += 1;
-      }
-
-      byBlankId[blank.id] = {
-        blankId: blank.id,
-        userAnswer,
-        expectedOptions: blank.options,
-        isAnswered,
-        isCorrect,
-      };
+    if (isAnswered) {
+      answeredItems += 1;
     }
+
+    const normalizedUserSentence = normalizeSentence(userSentence);
+    const isCorrect = expectedSentences.some(
+      (expectedSentence) => normalizeSentence(expectedSentence) === normalizedUserSentence,
+    );
+
+    if (isCorrect) {
+      correctItems += 1;
+    }
+
+    byItemId[item.id] = {
+      itemId: item.id,
+      userSentence,
+      expectedSentences,
+      isAnswered,
+      isCorrect,
+    };
   }
 
   return {
-    byBlankId,
-    totalBlanks,
-    answeredBlanks,
-    correctBlanks,
-    incorrectBlanks: totalBlanks - correctBlanks,
+    byItemId,
+    totalItems,
+    answeredItems,
+    correctItems,
+    incorrectItems: totalItems - correctItems,
   };
 }

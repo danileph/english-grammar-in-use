@@ -121,26 +121,23 @@ export function ExerciseCard({
     [answersByBlankId, items],
   );
 
-  const checkResult = useMemo(
-    () => checkExerciseAnswers(items, answersByBlankId),
-    [answersByBlankId, items],
-  );
+  const checkResult = useMemo(() => checkExerciseAnswers(items, answersByItemId), [answersByItemId, items]);
 
-  const mistakesByBlankId = useMemo(() => {
-    const mistakes: Record<string, { expectedOptions: string[]; userAnswer: string }> = {};
-    for (const [blankId, result] of Object.entries(checkResult.byBlankId)) {
+  const mistakesByItemId = useMemo(() => {
+    const mistakes: Record<string, { expectedSentences: string[]; userSentence: string }> = {};
+    for (const [itemId, result] of Object.entries(checkResult.byItemId)) {
       if (result.isCorrect) {
         continue;
       }
 
-      mistakes[blankId] = {
-        expectedOptions: result.expectedOptions,
-        userAnswer: result.userAnswer,
+      mistakes[itemId] = {
+        expectedSentences: result.expectedSentences,
+        userSentence: result.userSentence,
       };
     }
 
     return mistakes;
-  }, [checkResult.byBlankId]);
+  }, [checkResult.byItemId]);
 
   const usedWords = useWordBankUsage(words, answerTexts);
 
@@ -195,7 +192,7 @@ export function ExerciseCard({
                 valuesByItemId={answersByItemId}
                 onItemValueChange={handleItemValueChange}
                 showMistakes={isChecked}
-                mistakesByBlankId={mistakesByBlankId}
+                mistakesByItemId={mistakesByItemId}
               />
             );
           }
@@ -218,7 +215,7 @@ export function ExerciseCard({
                         onItemValueChange={handleItemValueChange}
                         hideItemLabel
                         showMistakes={isChecked}
-                        mistakesByBlankId={mistakesByBlankId}
+                        mistakesByItemId={mistakesByItemId}
                       />
                     </div>
                   </div>
@@ -230,7 +227,7 @@ export function ExerciseCard({
       </div>
       {isChecked ? (
         <div className="mt-5 rounded-xl border bg-muted/40 px-3 py-2 text-sm">
-          {checkResult.correctBlanks}/{checkResult.totalBlanks} correct. Mistakes: {checkResult.incorrectBlanks}
+          {checkResult.correctItems}/{checkResult.totalItems} correct. Mistakes: {checkResult.incorrectItems}
         </div>
       ) : null}
     </Card>

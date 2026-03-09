@@ -8,7 +8,7 @@ type ExerciseItemProps = {
   onItemValueChange: (itemId: string, value: string) => void;
   hideItemLabel?: boolean;
   showMistakes?: boolean;
-  mistakesByBlankId?: Record<string, { expectedOptions: string[]; userAnswer: string }>;
+  mistakesByItemId?: Record<string, { expectedSentences: string[]; userSentence: string }>;
 };
 
 export function ExerciseItem({
@@ -17,11 +17,11 @@ export function ExerciseItem({
   onItemValueChange,
   hideItemLabel = false,
   showMistakes = false,
-  mistakesByBlankId,
+  mistakesByItemId,
 }: ExerciseItemProps) {
   const gapMarkers = item.blanks.map((blank) => blank.placeholder || "..........");
-  const hasMistakes =
-    showMistakes && item.blanks.some((blank) => Boolean(mistakesByBlankId?.[blank.id]));
+  const mistake = mistakesByItemId?.[item.id];
+  const hasMistakes = showMistakes && Boolean(mistake);
 
   return (
     <div className="flex items-start gap-3">
@@ -43,19 +43,7 @@ export function ExerciseItem({
         </div>
         {hasMistakes ? (
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
-            {item.blanks
-              .map((blank) => {
-                const mistake = mistakesByBlankId?.[blank.id];
-                if (!mistake) {
-                  return null;
-                }
-
-                const expected = mistake.expectedOptions.join(" / ");
-                const actual = mistake.userAnswer.trim() || "(empty)";
-                return `${blank.id}: expected "${expected}", got "${actual}"`;
-              })
-              .filter(Boolean)
-              .join(" | ")}
+            Correct sentence: {(mistake?.expectedSentences ?? []).join(" / ")}
           </div>
         ) : null}
       </div>
