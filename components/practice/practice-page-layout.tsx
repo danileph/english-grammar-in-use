@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import type { PracticeMockData } from "@/lib/mock-practice";
+import type { PracticeExerciseStep, PracticeMockData } from "@/lib/mock-practice";
 
 import { ExerciseCard } from "@/components/practice/exercise-card";
 import { ExerciseProgressSidebar } from "@/components/practice/exercise-progress-sidebar";
@@ -12,6 +12,7 @@ import { PracticeBottomBar } from "@/components/practice/practice-bottom-bar";
 import { PracticeHeader } from "@/components/practice/practice-header";
 
 type PracticePageLayoutProps = {
+  unitId: string;
   data: PracticeMockData;
   topic: string;
   title: string;
@@ -19,9 +20,12 @@ type PracticePageLayoutProps = {
   primaryActionHref: string;
   primaryActionLabel: string;
   primaryActionIcon?: "back";
+  initialCompletedExerciseIds: string[];
+  initialAttemptsByExerciseId: Record<string, { answersByItemId: Record<string, string>; isChecked: boolean }>;
 };
 
 export function PracticePageLayout({
+  unitId,
   data,
   topic,
   title,
@@ -29,14 +33,52 @@ export function PracticePageLayout({
   primaryActionHref,
   primaryActionLabel,
   primaryActionIcon,
+  initialCompletedExerciseIds,
+  initialAttemptsByExerciseId,
 }: PracticePageLayoutProps) {
   const router = useRouter();
   const [checkAnswersSignal, setCheckAnswersSignal] = useState(0);
+  const [canCheckAnswers, setCanCheckAnswers] = useState(false);
+  const [exerciseProgress, setExerciseProgress] = useState({
+    completedElements: 0,
+    totalElements: data.exerciseItems.length,
+  });
+  const [completedExerciseIds, setCompletedExerciseIds] = useState(() => new Set(initialCompletedExerciseIds));
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{ type: "href"; href: string } | { type: "back" } | null>(
     null,
   );
   const allowNavigationRef = useRef(false);
+  const completedCount = completedExerciseIds.size;
+  const totalCount = data.steps.length;
+  const sidebarSteps = useMemo<PracticeExerciseStep[]>(
+    () => {
+      const firstIncompleteIndex = data.steps.findIndex((step) => !completedExerciseIds.has(step.id));
+
+      return data.steps.map((step, index) => {
+        const isCompleted = completedExerciseIds.has(step.id);
+        const isCurrent =
+          !isCompleted &&
+          firstIncompleteIndex >= 0 &&
+          index === firstIncompleteIndex;
+
+        return {
+          ...step,
+          status: isCompleted ? "completed" : isCurrent ? "current" : "upcoming",
+        };
+      });
+    },
+    [completedExerciseIds, data.steps],
+  );
+  const handleWordBankUsageChange = useCallback((allWordsUsed: boolean) => {
+    setCanCheckAnswers(allWordsUsed);
+  }, []);
+  const handleExerciseProgressChange = useCallback(
+    (progress: { completedElements: number; totalElements: number }) => {
+      setExerciseProgress(progress);
+    },
+    [],
+  );
 
   useEffect(() => {
     const onDocumentClick = (event: MouseEvent) => {
@@ -153,6 +195,46 @@ export function PracticePageLayout({
     window.location.assign(destinationUrl.href);
   };
 
+  const handleAnswersChecked = useCallback(
+    async (result: {
+      exerciseId: string;
+      correctItems: number;
+      totalItems: number;
+      accuracy: number;
+      answersByItemId: Record<string, string>;
+    }) => {
+      const response = await fetch("/api/exercise-attempts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          unitId,
+          exerciseId: result.exerciseId,
+          correctItems: result.correctItems,
+          totalItems: result.totalItems,
+          answersByItemId: result.answersByItemId,
+        }),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const payload: { isCompleted: boolean } = await response.json();
+      if (!payload.isCompleted) {
+        return;
+      }
+
+      setCompletedExerciseIds((current) => {
+        const next = new Set(current);
+        next.add(result.exerciseId);
+        return next;
+      });
+    },
+    [unitId],
+  );
+
   return (
     <>
       <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_280px]">
@@ -171,6 +253,7 @@ export function PracticePageLayout({
           />
 
           <ExerciseCard
+            exerciseId={data.steps[0]?.id}
             exerciseNumber={data.steps[0]?.id}
             instruction={data.instruction}
             practiceSectionLabel={data.practiceSectionLabel}
@@ -178,21 +261,37 @@ export function PracticePageLayout({
             words={data.wordBank}
             items={data.exerciseItems}
             checkAnswersSignal={checkAnswersSignal}
+            initialAnswersByItemId={
+              data.steps[0]?.id ? initialAttemptsByExerciseId[data.steps[0].id]?.answersByItemId : undefined
+            }
+            initialIsChecked={Boolean(data.steps[0]?.id && initialAttemptsByExerciseId[data.steps[0].id]?.isChecked)}
+            onWordBankUsageChange={handleWordBankUsageChange}
+            onExerciseProgressChange={handleExerciseProgressChange}
+            onAnswersChecked={handleAnswersChecked}
           />
 
           <PracticeBottomBar
             current={data.currentExerciseNumber}
             total={data.totalExercises}
-            onCheckAnswers={() => setCheckAnswersSignal((current) => current + 1)}
+            progressCompleted={exerciseProgress.completedElements}
+            progressTotal={exerciseProgress.totalElements}
+            canCheckAnswers={canCheckAnswers}
+            onCheckAnswers={() => {
+              if (!canCheckAnswers) {
+                return;
+              }
+
+              setCheckAnswersSignal((current) => current + 1);
+            }}
           />
         </div>
 
         <div className="h-(100%+24px) -my-6 py-2 md:justify-self-end md:border-l md:-mr-6">
           <div className="md:sticky md:top-24 md:h-[calc(100vh-135px)] md:w-[240px] md:overflow-y-auto">
             <ExerciseProgressSidebar
-              completed={data.completedExercises}
-              total={data.totalExercises}
-              steps={data.steps}
+              completed={completedCount}
+              total={totalCount}
+              steps={sidebarSteps}
             />
           </div>
         </div>

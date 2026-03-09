@@ -94,6 +94,10 @@ model ExerciseAttempt {
   unitId     String
   exerciseId String
   correct    Boolean
+  correctItems Int    @default(0)
+  totalItems   Int    @default(1)
+  accuracy     Int    @default(0)
+  answersByItemId String?
   createdAt  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
