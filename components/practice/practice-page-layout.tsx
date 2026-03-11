@@ -317,8 +317,8 @@ export function PracticePageLayout({
 
   return (
     <>
-      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="space-y-6">
+      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_232px]">
+        <div className="space-y-5">
           <PracticeHeader
             topic={topic}
             title={title}
