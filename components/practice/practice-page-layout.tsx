@@ -343,7 +343,6 @@ export function PracticePageLayout({
               exerciseNumber={activeExercise.id}
               instruction={activeExercise.instruction}
               practiceSectionLabel={activeExercise.practiceSectionLabel}
-              wordBankLabel={activeExercise.wordBankLabel}
               words={activeExercise.wordBank}
               items={activeExercise.items}
               checkAnswersSignal={checkAnswersSignal}

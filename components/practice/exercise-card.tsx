@@ -17,7 +17,6 @@ type ExerciseCardProps = {
   exerciseNumber?: string;
   instruction: string;
   practiceSectionLabel?: string;
-  wordBankLabel: string;
   words: string[];
   items: PracticeExerciseItem[];
   checkAnswersSignal?: number;
@@ -58,7 +57,6 @@ export function ExerciseCard({
   exerciseNumber,
   instruction,
   practiceSectionLabel,
-  wordBankLabel,
   words,
   items,
   checkAnswersSignal = 0,
@@ -253,7 +251,7 @@ export function ExerciseCard({
 
       {words.length > 0 ? (
         <div className="mt-5">
-          <WordBank label={wordBankLabel} words={words} usedWords={usedWords} />
+          <WordBank words={words} usedWords={usedWords} />
         </div>
       ) : null}
 

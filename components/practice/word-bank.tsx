@@ -3,12 +3,11 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type WordBankProps = {
-  label: string;
   words: string[];
   usedWords?: Set<string>;
 };
 
-export function WordBank({ label, words, usedWords }: WordBankProps) {
+export function WordBank({ words, usedWords }: WordBankProps) {
   return (
     <div className="rounded-xl border bg-muted/45 p-2">
       <div className="flex flex-wrap items-center gap-1.5">
