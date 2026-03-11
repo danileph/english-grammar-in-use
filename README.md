@@ -11,7 +11,7 @@ Full-stack Next.js starter for an interactive advanced English grammar learning 
 - react-hook-form + zod for form validation
 
 ## Features included
-- Email sign in (`/sign-in`)
+- Email/password sign in and sign up (`/sign-in`)
 - Protected units page (`/units`)
 - Prisma models for users, units, progress, and exercise attempts
 - Progress API (`GET/POST /api/progress`)

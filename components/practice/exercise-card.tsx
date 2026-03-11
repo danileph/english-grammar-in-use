@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { PracticeExerciseItem } from "@/lib/mock-practice";
 
@@ -10,9 +10,10 @@ import { useWordBankUsage } from "@/components/practice/hooks/use-word-bank-usag
 import { WordBank } from "@/components/practice/word-bank";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { checkExerciseAnswers } from "@/lib/practice-answer-check";
+import { checkExerciseAnswers, evaluateChoiceChecks, matchesAnswerOption } from "@/lib/practice-answer-check";
 
 type ExerciseCardProps = {
+  exerciseId?: string;
   exerciseNumber?: string;
   instruction: string;
   practiceSectionLabel?: string;
@@ -20,6 +21,17 @@ type ExerciseCardProps = {
   words: string[];
   items: PracticeExerciseItem[];
   checkAnswersSignal?: number;
+  initialAnswersByItemId?: Record<string, string>;
+  initialIsChecked?: boolean;
+  onWordBankUsageChange?: (allWordsUsed: boolean) => void;
+  onExerciseProgressChange?: (progress: { completedElements: number; totalElements: number }) => void;
+  onAnswersChecked?: (result: {
+    exerciseId: string;
+    correctItems: number;
+    totalItems: number;
+    accuracy: number;
+    answersByItemId: Record<string, string>;
+  }) => void;
 };
 
 type GroupedExerciseItems = {
@@ -42,6 +54,7 @@ function parseExerciseLabel(label: string) {
 }
 
 export function ExerciseCard({
+  exerciseId,
   exerciseNumber,
   instruction,
   practiceSectionLabel,
@@ -49,7 +62,13 @@ export function ExerciseCard({
   words,
   items,
   checkAnswersSignal = 0,
+  initialAnswersByItemId,
+  initialIsChecked = false,
+  onWordBankUsageChange,
+  onExerciseProgressChange,
+  onAnswersChecked,
 }: ExerciseCardProps) {
+  const handledCheckSignalRef = useRef(0);
   const groupedItems = useMemo<GroupedExerciseItems[]>(() => {
     const groups = new Map<string, GroupedExerciseItems>();
 
@@ -91,12 +110,14 @@ export function ExerciseCard({
     const initial: Record<string, string> = {};
 
     for (const itemContext of itemContexts) {
-      initial[itemContext.itemId] = buildSentenceShell(itemContext.parts, itemContext.gapMarkers);
+      const defaultValue = buildSentenceShell(itemContext.parts, itemContext.gapMarkers);
+      const savedValue = initialAnswersByItemId?.[itemContext.itemId];
+      initial[itemContext.itemId] = typeof savedValue === "string" ? savedValue : defaultValue;
     }
 
     return initial;
   });
-  const isChecked = checkAnswersSignal > 0;
+  const isChecked = initialIsChecked || checkAnswersSignal > 0;
 
   const answersByBlankId = useMemo(() => {
     const nextAnswersByBlankId: Record<string, string> = {};
@@ -140,6 +161,64 @@ export function ExerciseCard({
   }, [checkResult.byItemId]);
 
   const usedWords = useWordBankUsage(words, answerTexts);
+  const requiredWordCount = useMemo(() => new Set(words.map((word) => word.toLowerCase())).size, [words]);
+  const exerciseProgress = useMemo(() => {
+    let totalElements = 0;
+    let completedElements = 0;
+
+    for (const item of items) {
+      if (item.choiceChecks && item.choiceChecks.length > 0) {
+        const points = evaluateChoiceChecks(answersByItemId[item.id] ?? "", item.choiceChecks);
+        totalElements += points.totalPoints;
+        completedElements += points.answeredPoints > 0 ? points.totalPoints : 0;
+        continue;
+      }
+
+      totalElements += 1;
+      const isCompleted =
+        words.length > 0
+          ? item.blanks.some((blank) => {
+              const answer = answersByBlankId[blank.id] ?? "";
+              return words.some((word) => matchesAnswerOption(answer, word));
+            })
+          : item.blanks.every((blank) => {
+              const answer = answersByBlankId[blank.id] ?? "";
+              const marker = blank.placeholder || "..........";
+              return answer.trim().length > 0 && answer.trim() !== marker.trim();
+            });
+      if (isCompleted) {
+        completedElements += 1;
+      }
+    }
+
+    return { completedElements, totalElements };
+  }, [answersByBlankId, answersByItemId, items, words]);
+  const allWordsUsed = requiredWordCount > 0 && usedWords.size >= requiredWordCount;
+  const canCheckAnswers = requiredWordCount > 0 ? allWordsUsed : exerciseProgress.completedElements > 0;
+
+  useEffect(() => {
+    onWordBankUsageChange?.(canCheckAnswers);
+  }, [canCheckAnswers, onWordBankUsageChange]);
+
+  useEffect(() => {
+    onExerciseProgressChange?.(exerciseProgress);
+  }, [exerciseProgress, onExerciseProgressChange]);
+
+  useEffect(() => {
+    if (checkAnswersSignal < 1 || !exerciseId || handledCheckSignalRef.current === checkAnswersSignal) {
+      return;
+    }
+
+    handledCheckSignalRef.current = checkAnswersSignal;
+    const accuracy = checkResult.totalItems > 0 ? Math.round((checkResult.correctItems / checkResult.totalItems) * 100) : 0;
+    onAnswersChecked?.({
+      exerciseId,
+      correctItems: checkResult.correctItems,
+      totalItems: checkResult.totalItems,
+      accuracy,
+      answersByItemId,
+    });
+  }, [answersByItemId, checkAnswersSignal, checkResult.correctItems, checkResult.totalItems, exerciseId, onAnswersChecked]);
 
   const handleItemValueChange = (itemId: string, value: string) => {
     setAnswersByItemId((current) => ({
@@ -172,9 +251,11 @@ export function ExerciseCard({
         </p>
       </div>
 
-      <div className="mt-5">
-        <WordBank label={wordBankLabel} words={words} usedWords={usedWords} />
-      </div>
+      {words.length > 0 ? (
+        <div className="mt-5">
+          <WordBank label={wordBankLabel} words={words} usedWords={usedWords} />
+        </div>
+      ) : null}
 
       <div className="mt-5 space-y-4 pr-1">
         {groupedItems.map((group) => {

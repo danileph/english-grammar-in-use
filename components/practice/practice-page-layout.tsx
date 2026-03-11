@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import type { PracticeMockData } from "@/lib/mock-practice";
+import type { PracticeExerciseStep, PracticeMockData } from "@/lib/mock-practice";
 
 import { ExerciseCard } from "@/components/practice/exercise-card";
 import { ExerciseProgressSidebar } from "@/components/practice/exercise-progress-sidebar";
@@ -12,6 +12,7 @@ import { PracticeBottomBar } from "@/components/practice/practice-bottom-bar";
 import { PracticeHeader } from "@/components/practice/practice-header";
 
 type PracticePageLayoutProps = {
+  unitId: string;
   data: PracticeMockData;
   topic: string;
   title: string;
@@ -19,9 +20,12 @@ type PracticePageLayoutProps = {
   primaryActionHref: string;
   primaryActionLabel: string;
   primaryActionIcon?: "back";
+  initialCompletedExerciseIds: string[];
+  initialAttemptsByExerciseId: Record<string, { answersByItemId: Record<string, string>; isChecked: boolean }>;
 };
 
 export function PracticePageLayout({
+  unitId,
   data,
   topic,
   title,
@@ -29,14 +33,76 @@ export function PracticePageLayout({
   primaryActionHref,
   primaryActionLabel,
   primaryActionIcon,
+  initialCompletedExerciseIds,
+  initialAttemptsByExerciseId,
 }: PracticePageLayoutProps) {
   const router = useRouter();
+  const stepsWithExercises = useMemo(
+    () =>
+      data.steps
+        .map((step) => ({
+          step,
+          exercise: data.exercises.find((exercise) => exercise.id === step.id),
+        }))
+        .filter((entry): entry is { step: PracticeExerciseStep; exercise: PracticeMockData["exercises"][number] } =>
+          Boolean(entry.exercise),
+        ),
+    [data.exercises, data.steps],
+  );
+  const initialActiveExerciseId = useMemo(() => {
+    const firstIncompleteStep = stepsWithExercises.find((entry) => !initialCompletedExerciseIds.includes(entry.step.id));
+    return firstIncompleteStep?.step.id ?? stepsWithExercises[0]?.step.id;
+  }, [initialCompletedExerciseIds, stepsWithExercises]);
+
+  const [activeExerciseId, setActiveExerciseId] = useState(initialActiveExerciseId ?? "");
   const [checkAnswersSignal, setCheckAnswersSignal] = useState(0);
+  const [exerciseRenderNonce, setExerciseRenderNonce] = useState(0);
+  const [isResetting, setIsResetting] = useState(false);
+  const [canCheckAnswers, setCanCheckAnswers] = useState(false);
+  const [attemptsByExerciseId, setAttemptsByExerciseId] = useState(initialAttemptsByExerciseId);
+  const activeExercise = useMemo(
+    () => stepsWithExercises.find((entry) => entry.step.id === activeExerciseId)?.exercise ?? stepsWithExercises[0]?.exercise,
+    [activeExerciseId, stepsWithExercises],
+  );
+  const activeExerciseIndex = useMemo(
+    () => stepsWithExercises.findIndex((entry) => entry.step.id === (activeExercise?.id ?? "")),
+    [activeExercise?.id, stepsWithExercises],
+  );
+  const [exerciseProgress, setExerciseProgress] = useState({
+    completedElements: 0,
+    totalElements: activeExercise?.items.length ?? 0,
+  });
+  const [completedExerciseIds, setCompletedExerciseIds] = useState(() => new Set(initialCompletedExerciseIds));
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{ type: "href"; href: string } | { type: "back" } | null>(
     null,
   );
   const allowNavigationRef = useRef(false);
+  const completedCount = completedExerciseIds.size;
+  const totalCount = stepsWithExercises.length;
+  const sidebarSteps = useMemo<PracticeExerciseStep[]>(
+    () => {
+      return stepsWithExercises.map(({ step }, index) => {
+        const isCompleted = completedExerciseIds.has(step.id);
+        const isCurrent = !isCompleted && index === activeExerciseIndex;
+
+        return {
+          ...step,
+          status: isCompleted ? "completed" : isCurrent ? "current" : "upcoming",
+        };
+      });
+    },
+    [activeExerciseIndex, completedExerciseIds, stepsWithExercises],
+  );
+  const handleWordBankUsageChange = useCallback((allWordsUsed: boolean) => {
+    setCanCheckAnswers(allWordsUsed);
+  }, []);
+  const handleExerciseProgressChange = useCallback(
+    (progress: { completedElements: number; totalElements: number }) => {
+      setExerciseProgress(progress);
+    },
+    [],
+  );
 
   useEffect(() => {
     const onDocumentClick = (event: MouseEvent) => {
@@ -153,10 +219,106 @@ export function PracticePageLayout({
     window.location.assign(destinationUrl.href);
   };
 
+  const handleAnswersChecked = useCallback(
+    async (result: {
+      exerciseId: string;
+      correctItems: number;
+      totalItems: number;
+      accuracy: number;
+      answersByItemId: Record<string, string>;
+    }) => {
+      const response = await fetch("/api/exercise-attempts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          unitId,
+          exerciseId: result.exerciseId,
+          correctItems: result.correctItems,
+          totalItems: result.totalItems,
+          answersByItemId: result.answersByItemId,
+        }),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const payload: { isCompleted: boolean } = await response.json();
+      setAttemptsByExerciseId((current) => ({
+        ...current,
+        [result.exerciseId]: {
+          answersByItemId: result.answersByItemId,
+          isChecked: true,
+        },
+      }));
+
+      if (!payload.isCompleted) {
+        return;
+      }
+
+      setCompletedExerciseIds((current) => {
+        const next = new Set(current);
+        next.add(result.exerciseId);
+        return next;
+      });
+    },
+    [unitId],
+  );
+
+  const handleRestartExercise = useCallback(async () => {
+    if (isResetting || !activeExercise) {
+      return;
+    }
+
+    const shouldReset = window.confirm(`Restart exercise ${activeExercise.id} from scratch?`);
+    if (!shouldReset) {
+      return;
+    }
+
+    setIsResetting(true);
+
+    try {
+      const response = await fetch("/api/exercise-attempts", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ unitId, exerciseId: activeExercise.id }),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      setCompletedExerciseIds((current) => {
+        const next = new Set(current);
+        next.delete(activeExercise.id);
+        return next;
+      });
+      setAttemptsByExerciseId((current) => {
+        const next = { ...current };
+        delete next[activeExercise.id];
+        return next;
+      });
+      setCanCheckAnswers(false);
+      setCheckAnswersSignal(0);
+      setExerciseProgress({
+        completedElements: 0,
+        totalElements: activeExercise.items.length,
+      });
+      setExerciseRenderNonce((current) => current + 1);
+      router.refresh();
+    } finally {
+      setIsResetting(false);
+    }
+  }, [activeExercise, isResetting, router, unitId]);
+
   return (
     <>
-      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="space-y-6">
+      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_232px]">
+        <div className="space-y-5">
           <PracticeHeader
             topic={topic}
             title={title}
@@ -168,31 +330,63 @@ export function PracticePageLayout({
               setPendingNavigation({ type: "href", href: new URL(primaryActionHref, window.location.href).href });
               setIsLeaveDialogOpen(true);
             }}
+            secondaryActionLabel={isResetting ? "Restarting..." : "Restart Exersice"}
+            secondaryActionIcon="restart"
+            onSecondaryActionClick={handleRestartExercise}
+            secondaryActionDisabled={isResetting}
           />
 
-          <ExerciseCard
-            exerciseNumber={data.steps[0]?.id}
-            instruction={data.instruction}
-            practiceSectionLabel={data.practiceSectionLabel}
-            wordBankLabel={data.wordBankLabel}
-            words={data.wordBank}
-            items={data.exerciseItems}
-            checkAnswersSignal={checkAnswersSignal}
-          />
+          {activeExercise ? (
+            <ExerciseCard
+              key={`${activeExercise.id}-${exerciseRenderNonce}`}
+              exerciseId={activeExercise.id}
+              exerciseNumber={activeExercise.id}
+              instruction={activeExercise.instruction}
+              practiceSectionLabel={activeExercise.practiceSectionLabel}
+              wordBankLabel={activeExercise.wordBankLabel}
+              words={activeExercise.wordBank}
+              items={activeExercise.items}
+              checkAnswersSignal={checkAnswersSignal}
+              initialAnswersByItemId={attemptsByExerciseId[activeExercise.id]?.answersByItemId}
+              initialIsChecked={Boolean(attemptsByExerciseId[activeExercise.id]?.isChecked)}
+              onWordBankUsageChange={handleWordBankUsageChange}
+              onExerciseProgressChange={handleExerciseProgressChange}
+              onAnswersChecked={handleAnswersChecked}
+            />
+          ) : null}
 
           <PracticeBottomBar
-            current={data.currentExerciseNumber}
-            total={data.totalExercises}
-            onCheckAnswers={() => setCheckAnswersSignal((current) => current + 1)}
+            current={activeExerciseIndex >= 0 ? activeExerciseIndex + 1 : 1}
+            total={stepsWithExercises.length}
+            progressCompleted={exerciseProgress.completedElements}
+            progressTotal={exerciseProgress.totalElements}
+            canCheckAnswers={canCheckAnswers}
+            onCheckAnswers={() => {
+              if (!canCheckAnswers) {
+                return;
+              }
+
+              setCheckAnswersSignal((current) => current + 1);
+            }}
           />
         </div>
 
         <div className="h-(100%+24px) -my-6 py-2 md:justify-self-end md:border-l md:-mr-6">
           <div className="md:sticky md:top-24 md:h-[calc(100vh-135px)] md:w-[240px] md:overflow-y-auto">
             <ExerciseProgressSidebar
-              completed={data.completedExercises}
-              total={data.totalExercises}
-              steps={data.steps}
+              completed={completedCount}
+              total={totalCount}
+              steps={sidebarSteps}
+              activeStepId={activeExercise?.id}
+              onStepSelect={(stepId) => {
+                const selectedExercise = stepsWithExercises.find((entry) => entry.step.id === stepId)?.exercise;
+                setCanCheckAnswers(false);
+                setExerciseProgress({
+                  completedElements: 0,
+                  totalElements: selectedExercise?.items.length ?? 0,
+                });
+                setActiveExerciseId(stepId);
+              }}
             />
           </div>
         </div>

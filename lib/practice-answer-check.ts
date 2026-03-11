@@ -117,6 +117,9 @@ export type ItemCheckResult = {
   expectedSentences: string[];
   isAnswered: boolean;
   isCorrect: boolean;
+  totalPoints?: number;
+  answeredPoints?: number;
+  correctPoints?: number;
 };
 
 export type ExerciseCheckResult = {
@@ -126,6 +129,52 @@ export type ExerciseCheckResult = {
   correctItems: number;
   incorrectItems: number;
 };
+
+function detectSelectedOptionIndex(userSentence: string, options: [string, string]) {
+  const [left, right] = options;
+  const normalizedUser = normalizeSentence(userSentence);
+  const hasLeft = normalizedUser.includes(normalizeSentence(left));
+  const hasRight = normalizedUser.includes(normalizeSentence(right));
+
+  if (hasLeft && !hasRight) {
+    return 0;
+  }
+
+  if (!hasLeft && hasRight) {
+    return 1;
+  }
+
+  return null;
+}
+
+export function evaluateChoiceChecks(
+  userSentence: string,
+  choiceChecks: Array<{ options: [string, string]; acceptedOptionIndexes: number[] }>,
+) {
+  let totalPoints = 0;
+  let answeredPoints = 0;
+  let correctPoints = 0;
+
+  for (const choiceCheck of choiceChecks) {
+    totalPoints += 1;
+    const selectedIndex = detectSelectedOptionIndex(userSentence, choiceCheck.options);
+
+    if (selectedIndex === null) {
+      continue;
+    }
+
+    answeredPoints += 1;
+    if (choiceCheck.acceptedOptionIndexes.includes(selectedIndex)) {
+      correctPoints += 1;
+    }
+  }
+
+  return {
+    totalPoints,
+    answeredPoints,
+    correctPoints,
+  };
+}
 
 export function checkExerciseAnswers(
   items: PracticeExerciseItem[],
@@ -137,7 +186,6 @@ export function checkExerciseAnswers(
   let correctItems = 0;
 
   for (const item of items) {
-    totalItems += 1;
     const userSentence = answersByItemId[item.id] ?? "";
     const expectedSentences =
       item.correctSentences && item.correctSentences.length > 0
@@ -149,9 +197,27 @@ export function checkExerciseAnswers(
             ),
           ];
 
-    const hasUnfilledPlaceholder = item.blanks.some((blank) =>
-      userSentence.includes(blank.placeholder || ".........."),
-    );
+    if (item.choiceChecks && item.choiceChecks.length > 0) {
+      const points = evaluateChoiceChecks(userSentence, item.choiceChecks);
+      totalItems += points.totalPoints;
+      answeredItems += points.answeredPoints;
+      correctItems += points.correctPoints;
+
+      byItemId[item.id] = {
+        itemId: item.id,
+        userSentence,
+        expectedSentences,
+        isAnswered: points.answeredPoints > 0,
+        isCorrect: points.correctPoints === points.totalPoints,
+        totalPoints: points.totalPoints,
+        answeredPoints: points.answeredPoints,
+        correctPoints: points.correctPoints,
+      };
+      continue;
+    }
+
+    totalItems += 1;
+    const hasUnfilledPlaceholder = item.blanks.some((blank) => userSentence.includes(blank.placeholder || ".........."));
     const isAnswered = userSentence.trim().length > 0 && !hasUnfilledPlaceholder;
 
     if (isAnswered) {
@@ -159,9 +225,7 @@ export function checkExerciseAnswers(
     }
 
     const normalizedUserSentence = normalizeSentence(userSentence);
-    const isCorrect = expectedSentences.some(
-      (expectedSentence) => normalizeSentence(expectedSentence) === normalizedUserSentence,
-    );
+    const isCorrect = expectedSentences.some((expectedSentence) => normalizeSentence(expectedSentence) === normalizedUserSentence);
 
     if (isCorrect) {
       correctItems += 1;

@@ -74,7 +74,6 @@ export default async function UnitDetailPage({
           <UnitMetaBar
             className="mt-4"
             estimatedMinutes={unit.estimatedMinutes}
-            learnersLabel="6k learners"
             primaryActionHref={`/units/${unit.order}/practice`}
             primaryActionLabel="Start practice"
           />

@@ -25,6 +25,12 @@ function renderInlineBold(text: string) {
 }
 
 export function UnitContentSectionCard({ section }: UnitContentSectionCardProps) {
+  const headlineToneClassName: Record<"rose" | "amber" | "slate", string> = {
+    rose: "bg-rose-50 text-stone-950 shadow-[0_10px_20px_-18px_rgba(120,53,15,0.65)]",
+    amber: "bg-amber-50 text-stone-950 shadow-[0_10px_20px_-18px_rgba(120,53,15,0.65)]",
+    slate: "bg-slate-100 text-stone-950 shadow-[0_10px_20px_-18px_rgba(51,65,85,0.65)]",
+  };
+
   return (
     <section id={section.id} className="scroll-mt-24">
       <Card className="space-y-4 rounded-2xl border p-6">
@@ -72,6 +78,24 @@ export function UnitContentSectionCard({ section }: UnitContentSectionCardProps)
                 <p key={`${section.id}-connector-${index}`} className="italic">
                   {renderInlineBold(block.text)}
                 </p>
+              );
+            }
+
+            if (block.type === "headline-grid") {
+              return (
+                <div
+                  key={`${section.id}-headline-grid-${index}`}
+                  className="grid gap-3 sm:grid-cols-2"
+                >
+                  {block.items.map((item, itemIndex) => (
+                    <div
+                      key={`${section.id}-headline-grid-${index}-${itemIndex}`}
+                      className={`w-fit max-w-full -rotate-1 rounded-sm px-4 py-3 font-serif text-xl font-bold uppercase tracking-tight ${headlineToneClassName[item.tone ?? "amber"]}`}
+                    >
+                      {renderInlineBold(item.text)}
+                    </div>
+                  ))}
+                </div>
               );
             }
 
