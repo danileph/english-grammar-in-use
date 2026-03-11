@@ -411,6 +411,110 @@ const unit2Exercise22: PracticeExercise = {
   ],
 };
 
+const unit2Exercise23: PracticeExercise = {
+  id: "2.3",
+  instruction: "Expand one of the sets of notes below to complete each dialogue.",
+  practiceSectionLabel: "E",
+  wordBankLabel: "E",
+  wordBank: [
+    "continually / change / mind",
+    "constantly / criticise / driving",
+    "forever / moan / work",
+    "forever / ask me / money",
+    "always / complain / handwriting",
+  ],
+  items: [
+    {
+      id: "1",
+      label: "1",
+      parts: ["A: I can't read this. B: You're ", "."],
+      blanks: [{ id: "1-blank-1", placeholder: "................", options: ["always complaining about my handwriting"] }],
+      correctSentences: ["A: I can't read this. B: You're always complaining about my handwriting."],
+    },
+    {
+      id: "2",
+      label: "2",
+      parts: ["A: Can I borrow €10? B: You're ", "."],
+      blanks: [{ id: "2-blank-1", placeholder: "................", options: ["forever asking me for money"] }],
+      correctSentences: ["A: Can I borrow €10? B: You're forever asking me for money."],
+    },
+    {
+      id: "3",
+      label: "3",
+      parts: ["A: That was a dangerous thing to do. B: You're ", "."],
+      blanks: [{ id: "3-blank-1", placeholder: "................", options: ["constantly criticising my driving"] }],
+      correctSentences: ["A: That was a dangerous thing to do. B: You're constantly criticising my driving."],
+    },
+    {
+      id: "4",
+      label: "4",
+      parts: ["A: I think I'll stay here after all. B: You're ", "."],
+      blanks: [{ id: "4-blank-1", placeholder: "................", options: ["continually changing your mind"] }],
+      correctSentences: ["A: I think I'll stay here after all. B: You're continually changing your mind."],
+    },
+    {
+      id: "5",
+      label: "5",
+      parts: ["A: I had a bad day at the office again. B: You're ", "."],
+      blanks: [{ id: "5-blank-1", placeholder: "................", options: ["forever moaning about work"] }],
+      correctSentences: ["A: I had a bad day at the office again. B: You're forever moaning about work."],
+    },
+  ],
+};
+
+const unit2Exercise24: PracticeExercise = {
+  id: "2.4",
+  instruction:
+    "Complete each pair of sentences using the same verb (in negative form if necessary). Use the present continuous or the present simple. Use ^ to add any words outside the gap.",
+  practiceSectionLabel: "D & E",
+  wordBankLabel: "",
+  wordBank: [],
+  items: [
+    {
+      id: "1a",
+      label: "1a",
+      parts: ["A: Shall I phone at six? B: No, we usually ", " dinner at that time."],
+      blanks: [{ id: "1a-blank-1", placeholder: "................", options: ["eat"] }],
+      correctSentences: ["A: Shall I phone at six? B: No, we usually eat dinner at that time."],
+    },
+    {
+      id: "1b",
+      label: "1b",
+      parts: ["I ", " lamb, thanks. I'm a vegetarian."],
+      blanks: [{ id: "1b-blank-1", placeholder: "................", options: ["don't eat"] }],
+      correctSentences: ["I don't eat lamb, thanks. I'm a vegetarian."],
+    },
+    {
+      id: "2a",
+      label: "2a",
+      parts: ["Gielman ^ ", " Henry V in the latest production at the Royal Theatre."],
+      blanks: [{ id: "2a-blank-1", placeholder: "................", options: ["playing"] }],
+      correctSentences: ["Gielman is playing Henry V in the latest production at the Royal Theatre."],
+    },
+    {
+      id: "2b",
+      label: "2b",
+      parts: ["They constantly ^ ", " loud music until the early hours of the morning."],
+      blanks: [{ id: "2b-blank-1", placeholder: "................", options: ["playing"] }],
+      correctSentences: ["They constantly are playing loud music until the early hours of the morning."],
+    },
+    {
+      id: "3a",
+      label: "3a",
+      parts: ["I normally ^ ", " the children to school at 8:30. Perhaps we could meet at 9:00."],
+      blanks: [{ id: "3a-blank-1", placeholder: "................", options: ["taking"] }],
+      correctSentences: ["I normally am taking the children to school at 8:30. Perhaps we could meet at 9:00."],
+    },
+    {
+      id: "3b",
+      label: "3b",
+      parts: ["In his recent book, Wall ", " a controversial view of Britain's role in the war."],
+      blanks: [{ id: "3b-blank-1", placeholder: "................", options: ["takes"] }],
+      correctSentences: ["In his recent book, Wall takes a controversial view of Britain's role in the war."],
+    },
+  ],
+};
+
 const unit1Practice: PracticeMockData = {
   contextLine: "Advanced Grammar in Use · Unit 1",
   pageTitle: "Unit 1: Practice",
@@ -430,14 +534,16 @@ const unit2Practice: PracticeMockData = {
   contextLine: "Advanced Grammar in Use · Unit 2",
   pageTitle: "Unit 2: Practice",
   lessonTitleLineOne: "Using present continuous and present simple",
-  lessonTitleLineTwo: "Exercises 2.1-2.2",
+  lessonTitleLineTwo: "Exercises 2.1-2.4",
   steps: [
     { id: "2.1", label: "2.1 Complete these sentences", status: "current" },
     { id: "2.2", label: "2.2 Complete what each person says about the news", status: "upcoming" },
+    { id: "2.3", label: "2.3 Expand one of the sets of notes", status: "upcoming" },
+    { id: "2.4", label: "2.4 Complete each pair of sentences", status: "upcoming" },
   ],
-  exercises: [unit2Exercise21, unit2Exercise22],
+  exercises: [unit2Exercise21, unit2Exercise22, unit2Exercise23, unit2Exercise24],
   completedExercises: 0,
-  totalExercises: 2,
+  totalExercises: 4,
   currentExerciseNumber: 1,
 };
 
